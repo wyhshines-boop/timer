@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a0b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title id="pageTitle">训练计时器</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0a0b;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-work: #00ff88;
+            --accent-rest: #ffbb00;
+            --accent-done: #00d2ff;
+            --accent-ready: #ffffff;
+            --glass-blur: 15px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 136, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 210, 255, 0.05) 0%, transparent 40%);
+            color: var(--text-primary);
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            user-select: none;
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+
+        /* App Container */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* Status Label */
+        .status {
+            font-size: clamp(1.5rem, 6vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .status.hold {
+            color: var(--accent-work);
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .status.rest {
+            color: var(--accent-rest);
+            text-shadow: 0 0 30px rgba(255, 187, 0, 0.3);
+        }
+
+        .status.done {
+            color: var(--accent-done);
+            text-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+        }
+
+        .status.ready {
+            color: var(--text-secondary);
+        }
+
+        /* Timer Display */
+        .timer-wrapper {
+            position: relative;
+            margin: 1rem 0;
+            transform: scale(1);
+            transition: transform 0.3s ease;
+        }
+
+        .countdown {
+            font-size: clamp(8rem, 35vw, 18rem);
+            font-weight: 900;
+            line-height: 0.9;
+            font-variant-numeric: tabular-nums;
+            transition: all 0.4s ease;
+        }
+
+        .countdown.hold {
+            color: var(--accent-work);
+        }
+
+        .countdown.rest {
+            color: var(--accent-rest);
+        }
+
+        .countdown.done {
+            color: var(--accent-done);
+            font-size: clamp(6rem, 25vw, 12rem);
+        }
+
+        .countdown.ready {
+            color: var(--text-primary);
+        }
+
+        /* Progress Info - Footer Style */
+        .info-panel {
+            position: fixed;
+            bottom: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 1.2rem;
+            z-index: 50;
+        }
+
+        .project-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-right: 1px solid var(--border-color);
+            padding-right: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-name:hover {
+            color: var(--text-primary);
+        }
+
+        .rep-info {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        /* Quick Switch Popover */
+        .quick-switch {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 30, 35, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 0.5rem;
+            min-width: 180px;
+            max-width: 280px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-50%) translateY(6px);
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+        }
+
+        .quick-switch::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 12px;
+            height: 12px;
+            background: rgba(30, 30, 35, 0.85);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 0 0 3px 0;
+        }
+
+        .quick-switch.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .quick-switch-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .quick-switch-item {
+            padding: 0.55rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .quick-switch-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+        }
+
+        .quick-switch-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* Progress Bar */
+        .progress-box {
+            width: 100%;
+            max-width: 400px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            margin-bottom: 3rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 5px;
+            transition: width 1s linear, background 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .progress-bar.hold {
+            background: var(--accent-work);
+            box-shadow: 0 0 15px var(--accent-work);
+        }
+
+        .progress-bar.rest {
+            background: var(--accent-rest);
+            box-shadow: 0 0 15px var(--accent-rest);
+        }
+
+        .progress-bar.done {
+            background: var(--accent-done);
+            width: 100% !important;
+        }
+
+        /* Controls */
+        .controls {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            align-items: center;
+            margin-bottom: 4rem;
+        }
+
+        .btn {
+            font-family: inherit;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 200px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: scale(0.92);
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-color);
+        }
+
+        .btn-primary.pause {
+            background: var(--accent-rest);
+            color: var(--bg-color);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid white;
+            font-size: 1rem;
+            padding: 0.6rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            color: var(--text-primary);
+            border-color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #resetBtn {
+            position: absolute;
+            top: 100%;
+            margin-top: 1rem;
+            z-index: 5;
+        }
+
+        /* Settings Toggle */
+        .settings-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .settings-toggle:hover {
+            /* background: rgba(255, 255, 255, 0.1); */
+            transform: rotate(45deg);
+        }
+
+        .settings-toggle svg {
+            fill: var(--text-primary);
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Modal Settings */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 25, 0.7);
+            padding: 2rem;
+            border-radius: 32px;
+            width: 95%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        /* Profile Selector */
+        .profile-selector {
+            display: flex;
+            gap: 0.8rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            align-items: center;
+        }
+
+        .profile-selector::-webkit-scrollbar {
+            display: none;
+        }
+
+        .profile-chip {
+            position: relative;
+            height: 40px;
+            padding: 0 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        /* Targeted animations */
+        .profile-chip.new-pop {
+            animation: chip-pop-in 0.4s ease;
+        }
+
+        @keyframes chip-pop-in {
+            0% {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .profile-chip.new-pop {
+            animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .profile-chip.removing {
+            animation: chip-pop-out 0.3s forwards cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        @keyframes chip-pop-out {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.5);
+                opacity: 0;
+                width: 0;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        .chip-content {
+            position: relative;
+            display: grid;
+            grid-template-areas: "overlay";
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .chip-label {
+            grid-area: overlay;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: none;
+        }
+
+        .chip-delete-label {
+            grid-area: overlay;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(10px);
+            color: inherit;
+            font-weight: 700;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .profile-chip.deletable .chip-label {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .profile-chip.deletable .chip-delete-label {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .profile-chip.active {
+            background: var(--text-primary);
+            color: var(--bg-color);
+            border-color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .profile-chip.deletable {
+            background: rgba(255, 68, 68, 0.15) !important;
+            border-color: rgba(255, 68, 68, 0.5) !important;
+            color: #ff4444 !important;
+        }
+
+        .profile-chip.deletable.active {
+            background: #ff4444 !important;
+            color: white !important;
+        }
+
+        .profile-chip.add-new {
+            background: rgba(0, 255, 136, 0.1);
+            border: none;
+            color: var(--accent-work);
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 50%;
+        }
+
+        .profile-chip.add-new svg {
+            display: block;
+            width: 18px;
+            height: 18px;
+        }
+
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+        }
+
+        .setting-group input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.2rem;
+            border-radius: 14px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .setting-group input:focus {
+            border-color: var(--accent-work);
+        }
+
+        .modal-footer {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: row;
+            gap: 0.8rem;
+            width: 100%;
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+            min-width: 0;
+            font-size: 1rem;
+            padding: 0.8rem 0.5rem;
+            white-space: nowrap;
+            border-radius: 50px;
+        }
+
+        .modal-footer .btn-secondary {
+            position: static;
+            margin-top: 0;
+            border-radius: 50px;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .timer-wrapper.animating {
+            animation: pulse 1s infinite ease-in-out;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body onclick="clearDeleteMode(event)">
+
+    <!-- Settings Trigger -->
+    <div class="settings-toggle" onclick="openModal()" title="设置">
+        <svg viewBox="0 0 24 24">
+            <path
+                d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+        </svg>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="status ready" id="status">准备开始</div>
+
+        <div class="timer-wrapper" id="timerWrapper">
+            <div class="countdown ready" id="countdown">0</div>
+        </div>
+
+        <div class="info-panel">
+            <div class="project-name" id="displayProjectName" onclick="toggleQuickSwitch(event)">我的训练</div>
+            <div class="rep-info">第 <span id="currentRep">1</span> / <span id="totalRepsDisplay">15</span> 轮</div>
+            <div class="quick-switch" id="quickSwitch">
+                <div class="quick-switch-list" id="quickSwitchList"></div>
+            </div>
+        </div>
+
+        <div class="progress-box">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="mainBtn" onclick="toggleTimer()">开 始</button>
+            <button class="btn btn-secondary" id="resetBtn" onclick="resetTimer()" style="display:none">重 置</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal" onclick="clearDeleteMode(event); closeModal()">
+        <div class="modal-content" onclick="clearDeleteMode(event); event.stopPropagation();">
+            <div class="profile-selector" id="profileSelector">
+                <!-- Chips added via JS -->
+            </div>
+
+            <div class="setting-group">
+                <label for="projectName">项目名称</label>
+                <input type="text" id="projectName" placeholder="例如：收下巴训练" maxlength="20">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="setting-group">
+                    <label for="holdTime">训练时长 (秒)</label>
+                    <input type="number" id="holdTime" min="1" max="3600">
+                </div>
+                <div class="setting-group">
+                    <label for="restTime">休息时长 (秒)</label>
+                    <input type="number" id="restTime" min="0" max="3600">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label for="totalReps">总轮数</label>
+                <input type="number" id="totalReps" min="1" max="999">
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveSettings()">保存计划</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Profiles State
+        let profiles = [
+            { id: '1', projectName: '收下巴训练', holdTime: 10, restTime: 5, totalReps: 15 }
+        ];
+        let activeProfileId = '1';
+        let deletableProfileId = null; // Track which chip is in "long-press" mode
+        let longPressTimer = null;
+
+        // State variables
+        let state = {
+            currentRep: 1,
+            timeLeft: 0,
+            phase: 'ready', // ready, hold, rest, done, prepare
+            intervalId: null,
+            isPaused: false
+        };
+
+        // DOM elements
+        const els = {
+            status: document.getElementById('status'),
+            countdown: document.getElementById('countdown'),
+            currentRep: document.getElementById('currentRep'),
+            totalRepsDisplay: document.getElementById('totalRepsDisplay'),
+            progressBar: document.getElementById('progressBar'),
+            mainBtn: document.getElementById('mainBtn'),
+            resetBtn: document.getElementById('resetBtn'),
+            projectNameDisplay: document.getElementById('displayProjectName'),
+            timerWrapper: document.getElementById('timerWrapper'),
+            modal: document.getElementById('settingsModal'),
+            profileSelector: document.getElementById('profileSelector'),
+            inputs: {
+                name: document.getElementById('projectName'),
+                hold: document.getElementById('holdTime'),
+                rest: document.getElementById('restTime'),
+                reps: document.getElementById('totalReps')
+            }
+        };
+
+        // Get currently editing config
+        function getActiveConfig() {
+            return profiles.find(p => p.id === activeProfileId) || profiles[0];
+        }
+
+        // Initialize App
+        function init() {
+            const savedProfiles = localStorage.getItem('timerProfiles');
+            const savedActiveId = localStorage.getItem('activeProfileId');
+            const legacyConfig = localStorage.getItem('timerConfig');
+
+            if (savedProfiles) {
+                try {
+                    profiles = JSON.parse(savedProfiles);
+                    activeProfileId = savedActiveId || profiles[0].id;
+                } catch (e) { console.error("Load error", e); }
+            } else if (legacyConfig) {
+                try {
+                    const old = JSON.parse(legacyConfig);
+                    profiles = [{ ...old, id: 'migrated_' + Date.now() }];
+                    activeProfileId = profiles[0].id;
+                    localStorage.setItem('timerProfiles', JSON.stringify(profiles));
+                    localStorage.setItem('activeProfileId', activeProfileId);
+                    localStorage.removeItem('timerConfig');
+                } catch (e) { console.error("Migration error", e); }
+            }
+            renderProfileChips();
+            applyActiveProfile();
+            resetTimer();
+        }
+
+        let latestAddedId = null; // To track which chip should animate pop-in
+
+        function renderProfileChips() {
+            els.profileSelector.innerHTML = '';
+            profiles.forEach(p => {
+                const chip = document.createElement('div');
+                const isNew = p.id === latestAddedId;
+
+                chip.className = `profile-chip ${p.id === activeProfileId ? 'active' : ''} ${isNew ? 'new-pop' : ''}`;
+
+                // Reset new-pop flag after rendering so it doesn't repeat
+                if (isNew) {
+                    setTimeout(() => { chip.classList.remove('new-pop'); latestAddedId = null; }, 500);
+                }
+
+                // Content Wrapper for transitions
+                const wrapper = document.createElement('div');
+                wrapper.className = 'chip-content';
+
+                const label = document.createElement('span');
+                label.className = 'chip-label';
+                label.textContent = p.name || p.projectName;
+
+                const deleteLabel = document.createElement('span');
+                deleteLabel.className = 'chip-delete-label';
+                deleteLabel.textContent = '确认移除？';
+
+                wrapper.appendChild(label);
+                wrapper.appendChild(deleteLabel);
+                chip.appendChild(wrapper);
+
+                // Interaction Handling
+                chip.onmousedown = (e) => startLongPress(e, p.id);
+                chip.ontouchstart = (e) => startLongPress(e, p.id);
+                chip.onmouseup = () => cancelLongPress();
+                chip.ontouchend = () => cancelLongPress();
+                chip.onmouseleave = () => cancelLongPress();
+                chip.onclick = (e) => {
+                    e.stopPropagation();
+                    if (deletableProfileId === p.id) {
+                        deleteProfile(p.id);
+                    } else if (deletableProfileId) {
+                        clearDeleteMode();
+                    } else {
+                        switchProfile(p.id);
+                    }
+                };
+
+                els.profileSelector.appendChild(chip);
+            });
+
+            const addBtn = document.createElement('div');
+            addBtn.className = 'profile-chip add-new';
+            addBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+            addBtn.onclick = () => addNewProfile();
+            els.profileSelector.appendChild(addBtn);
+        }
+
+        function startLongPress(e, id) {
+            cancelLongPress();
+            if (profiles.length <= 1) return;
+            longPressTimer = setTimeout(() => {
+                deletableProfileId = id;
+                applyDeleteMode();
+            }, 600);
+        }
+
+        function cancelLongPress() {
+            if (longPressTimer) clearTimeout(longPressTimer);
+        }
+
+        function applyDeleteMode() {
+            const chips = els.profileSelector.querySelectorAll('.profile-chip:not(.add-new)');
+            profiles.forEach((p, i) => {
+                const chip = chips[i];
+                if (!chip) return;
+                if (p.id === deletableProfileId) {
+                    chip.classList.add('deletable');
+                } else {
+                    chip.classList.remove('deletable');
+                }
+            });
+        }
+
+        function clearDeleteMode(e) {
+            if (deletableProfileId) {
+                deletableProfileId = null;
+                applyDeleteMode();
+            }
+        }
+
+        function switchProfile(id) {
+            if (activeProfileId === id) return;
+            activeProfileId = id;
+            localStorage.setItem('activeProfileId', activeProfileId);
+            renderProfileChips();
+            applyActiveProfile();
+            resetTimer();
+        }
+
+        // Quick Switch Popover
+        function toggleQuickSwitch(e) {
+            e.stopPropagation();
+            const qs = document.getElementById('quickSwitch');
+            if (qs.classList.contains('active')) {
+                closeQuickSwitch();
+            } else {
+                renderQuickSwitchList();
+                qs.classList.add('active');
+            }
+        }
+
+        function renderQuickSwitchList() {
+            const list = document.getElementById('quickSwitchList');
+            list.innerHTML = '';
+            profiles.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'quick-switch-item' + (p.id === activeProfileId ? ' active' : '');
+                item.textContent = p.name || p.projectName;
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    closeQuickSwitch();
+                    switchProfile(p.id);
+                };
+                list.appendChild(item);
+            });
+        }
+
+        function closeQuickSwitch() {
+            document.getElementById('quickSwitch').classList.remove('active');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.quick-switch') && !e.target.closest('.project-name')) {
+                closeQuickSwitch();
+            }
+        });
+
+        function applyActiveProfile() {
+            const config = getActiveConfig();
+            els.projectNameDisplay.textContent = config.name || config.projectName;
+            els.totalRepsDisplay.textContent = config.totalReps;
+            document.getElementById('pageTitle').textContent = (config.name || config.projectName) + ' - 计时器';
+            els.inputs.name.value = config.name || config.projectName;
+            els.inputs.hold.value = config.holdTime;
+            els.inputs.rest.value = config.restTime;
+            els.inputs.reps.value = config.totalReps;
+        }
+
+        function addNewProfile() {
+            const newId = 'p_' + Date.now();
+            profiles.push({ id: newId, name: '新计划 ' + (profiles.length + 1), holdTime: 10, restTime: 5, totalReps: 10 });
+            activeProfileId = newId;
+            latestAddedId = newId; // Mark for animation
+            saveProfilesToStorage();
+            renderProfileChips();
+            applyActiveProfile();
+            resetTimer();
+        }
+
+        function deleteProfile(id) {
+            const index = profiles.findIndex(p => p.id === id);
+            const chipEls = els.profileSelector.querySelectorAll('.profile-chip');
+            const chipToAnimate = chipEls[index];
+
+            if (chipToAnimate) {
+                chipToAnimate.classList.add('removing');
+                setTimeout(() => finalizeDelete(id), 250);
+            } else {
+                finalizeDelete(id);
+            }
+        }
+
+        function finalizeDelete(id) {
+            const index = profiles.findIndex(p => p.id === id);
+            profiles.splice(index, 1);
+            if (activeProfileId === id) activeProfileId = profiles[0].id;
+            deletableProfileId = null;
+            saveProfilesToStorage();
+            renderProfileChips();
+            applyActiveProfile();
+            resetTimer();
+        }
+
+        function saveProfilesToStorage() {
+            localStorage.setItem('timerProfiles', JSON.stringify(profiles));
+            localStorage.setItem('activeProfileId', activeProfileId);
+        }
+
+        function saveSettings() {
+            const config = getActiveConfig();
+            config.name = els.inputs.name.value.trim() || '未命名训练';
+            config.projectName = config.name;
+            config.holdTime = parseInt(els.inputs.hold.value) || 10;
+            config.restTime = parseInt(els.inputs.rest.value) || 0;
+            config.totalReps = parseInt(els.inputs.reps.value) || 1;
+            saveProfilesToStorage();
+            applyActiveProfile();
+            resetTimer();
+            closeModal();
+        }
+
+        function updateDisplay() {
+            els.countdown.textContent = state.timeLeft;
+            els.currentRep.textContent = state.currentRep;
+            els.status.className = 'status ' + state.phase;
+            els.countdown.className = 'countdown ' + state.phase;
+            els.progressBar.className = 'progress-bar ' + state.phase;
+            const config = getActiveConfig();
+            if (state.phase === 'hold') {
+                els.status.textContent = '训 练 中';
+                els.progressBar.style.width = ((config.holdTime - state.timeLeft) / config.holdTime) * 100 + '%';
+                els.timerWrapper.classList.add('animating');
+                if (!state.isPaused) { els.mainBtn.textContent = '暂 停'; els.mainBtn.classList.add('pause'); }
+            } else if (state.phase === 'rest') {
+                els.status.textContent = '休 息';
+                els.progressBar.style.width = ((config.restTime - state.timeLeft) / config.restTime) * 100 + '%';
+                els.timerWrapper.classList.remove('animating');
+                if (!state.isPaused) { els.mainBtn.textContent = '暂 停'; els.mainBtn.classList.add('pause'); }
+            } else if (state.phase === 'prepare') {
+                els.status.textContent = '准 备';
+                els.countdown.textContent = state.timeLeft;
+                els.progressBar.style.width = '0%';
+                els.timerWrapper.classList.remove('animating');
+                els.mainBtn.textContent = '准 备...';
+            } else if (state.phase === 'done') {
+                els.status.textContent = '任 务 完 成 ！';
+                els.countdown.textContent = 'FIN';
+                els.timerWrapper.classList.remove('animating');
+                els.mainBtn.textContent = '再练一局';
+                els.mainBtn.classList.remove('pause');
+            } else if (state.phase === 'ready') {
+                els.status.textContent = '准备开始';
+                els.countdown.textContent = config.holdTime;
+                els.progressBar.style.width = '0%';
+                els.timerWrapper.classList.remove('animating');
+                els.mainBtn.textContent = '开 始';
+                els.mainBtn.classList.remove('pause');
+            }
+            if (state.isPaused) { els.mainBtn.textContent = '继 续'; els.mainBtn.classList.remove('pause'); }
+        }
+
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function beep(freq, duration, volume = 0.2) {
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(volume, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration / 1000);
+                osc.start();
+                osc.stop(ctx.currentTime + duration / 1000);
+            } catch (e) { console.error("Beep Error:", e); }
+        }
+
+        function playSound(type) {
+            switch (type) {
+                case 'countdown': beep(800, 150, 0.15); break;
+                case 'start': beep(1200, 400, 0.3); break;
+                case 'transition': beep(500, 300, 0.25); break;
+                case 'done': beep(1000, 200, 0.2); setTimeout(() => beep(1300, 500, 0.3), 200); break;
+            }
+        }
+
+        function tick() {
+            if (state.timeLeft > 0) { if (state.timeLeft <= 3) playSound('countdown'); state.timeLeft--; }
+            const config = getActiveConfig();
+            if (state.timeLeft <= 0) {
+                if (state.phase === 'hold') {
+                    if (state.currentRep >= config.totalReps) { playSound('done'); endTimer(); return; }
+                    playSound('transition'); state.phase = 'rest'; state.timeLeft = config.restTime;
+                } else if (state.phase === 'rest' || state.phase === 'prepare') {
+                    playSound('start'); if (state.phase === 'rest') state.currentRep++; state.phase = 'hold'; state.timeLeft = config.holdTime;
+                }
+            }
+            updateDisplay();
+        }
+
+        function toggleTimer() {
+            if (state.phase === 'ready' || state.phase === 'done') prepareTimer();
+            else if (state.isPaused) resumeTimer();
+            else pauseTimer();
+        }
+
+        function prepareTimer() {
+            state.phase = 'prepare'; state.timeLeft = 3; state.currentRep = 1; state.isPaused = false;
+            els.mainBtn.textContent = '准 备...'; els.mainBtn.classList.add('pause'); els.resetBtn.style.display = 'block';
+            updateDisplay(); state.intervalId = setInterval(tick, 1000);
+        }
+
+        function pauseTimer() { state.isPaused = true; els.mainBtn.textContent = '继 续'; els.mainBtn.classList.remove('pause'); clearInterval(state.intervalId); state.intervalId = null; }
+        function resumeTimer() { state.isPaused = false; els.mainBtn.textContent = '暂 停'; els.mainBtn.classList.add('pause'); state.intervalId = setInterval(tick, 1000); }
+        function endTimer() { state.phase = 'done'; state.timeLeft = 0; clearInterval(state.intervalId); state.intervalId = null; els.mainBtn.textContent = '再练一局'; els.mainBtn.classList.remove('pause'); els.resetBtn.style.display = 'block'; playSound('done'); updateDisplay(); }
+        function resetTimer() { clearInterval(state.intervalId); state.intervalId = null; state.phase = 'ready'; state.currentRep = 1; state.timeLeft = getActiveConfig().holdTime; state.isPaused = false; els.mainBtn.textContent = '开 始'; els.mainBtn.classList.remove('pause'); els.resetBtn.style.display = 'none'; updateDisplay(); }
+        function openModal() { if (state.phase !== 'ready' && state.phase !== 'done') pauseTimer(); applyActiveProfile(); els.modal.classList.add('active'); }
+        function closeModal() { els.modal.classList.remove('active'); clearDeleteMode(); }
+        init();
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js');
+        }
+    </script>
+
+</body>
+
+</html>
