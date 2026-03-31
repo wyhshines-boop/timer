@@ -1023,13 +1023,14 @@
             return audioCtx;
         }
 
-        function beep(freq, duration, volume = 0.2) {
+        function beep(freq, duration, volume = 0.2, type = 'sine') {
             try {
                 const ctx = getAudioContext();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.connect(gain);
                 gain.connect(ctx.destination);
+                osc.type = type;
                 osc.frequency.value = freq;
                 gain.gain.setValueAtTime(volume, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration / 1000);
@@ -1038,12 +1039,46 @@
             } catch (e) { console.error("Beep Error:", e); }
         }
 
+        // 中文语音播报
+        function speak(text) {
+            try {
+                if (!('speechSynthesis' in window)) return;
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = 'zh-CN';
+                utter.rate = 1.1;
+                utter.volume = 0.9;
+                window.speechSynthesis.speak(utter);
+            } catch (e) { console.error("Speech Error:", e); }
+        }
+
         function playSound(type) {
             switch (type) {
-                case 'countdown': beep(800, 150, 0.15); break;
-                case 'start': beep(1200, 400, 0.3); break;
-                case 'transition': beep(500, 300, 0.25); break;
-                case 'done': beep(1000, 200, 0.2); setTimeout(() => beep(1300, 500, 0.3), 200); break;
+                case 'countdown':
+                    // 倒计时：短促高音滴答声
+                    beep(1000, 100, 0.2, 'sine');
+                    break;
+                case 'start':
+                    // 开始坚持：上升双音 + 语音
+                    beep(600, 150, 0.25, 'sine');
+                    setTimeout(() => beep(900, 150, 0.25, 'sine'), 160);
+                    setTimeout(() => beep(1200, 300, 0.3, 'sine'), 330);
+                    speak('开始');
+                    break;
+                case 'transition':
+                    // 进入休息：下降音阶 + 语音
+                    beep(800, 150, 0.2, 'triangle');
+                    setTimeout(() => beep(600, 150, 0.2, 'triangle'), 170);
+                    setTimeout(() => beep(400, 300, 0.2, 'triangle'), 350);
+                    speak('休息');
+                    break;
+                case 'done':
+                    // 全部完成：庆祝音效 + 语音
+                    beep(800, 150, 0.25, 'sine');
+                    setTimeout(() => beep(1000, 150, 0.25, 'sine'), 170);
+                    setTimeout(() => beep(1200, 150, 0.25, 'sine'), 340);
+                    setTimeout(() => beep(1600, 500, 0.35, 'sine'), 510);
+                    speak('训练完成');
+                    break;
             }
         }
 
