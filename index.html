@@ -437,6 +437,17 @@
             margin-bottom: 1.2rem;
             flex-shrink: 0;
             align-items: center;
+            position: relative;
+        }
+
+        .modal-tabs-indicator {
+            position: absolute;
+            bottom: 0;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 1px;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
         }
 
 
@@ -882,8 +893,9 @@
 
             <div class="modal-tabs">
                 <div class="modal-tab active" onclick="switchTab('queue')">队列</div>
-                <div class="modal-tab" onclick="switchTab('more')">更多</div>
+                <div class="modal-tab" onclick="switchTab('more')">个性化</div>
                 <div class="auto-queue-toggle" id="toggleAutoQueue" onclick="toggleDisplay('autoQueue')">连练模式</div>
+                <div class="modal-tabs-indicator" id="tabIndicator"></div>
             </div>
 
             <!-- 队列页 -->
@@ -985,6 +997,16 @@
             // Restore correct visibility after measuring
             q.classList.remove('active'); m.classList.remove('active');
         }
+        function moveIndicator() {
+            const activeTab = document.querySelector('.modal-tab.active');
+            const indicator = document.getElementById('tabIndicator');
+            const tabs = activeTab && activeTab.parentElement;
+            if (!activeTab || !indicator || !tabs) return;
+            const tabsRect = tabs.getBoundingClientRect();
+            const tabRect = activeTab.getBoundingClientRect();
+            indicator.style.left = (tabRect.left - tabsRect.left) + 'px';
+            indicator.style.width = tabRect.width + 'px';
+        }
         function switchTab(tab) {
             document.querySelectorAll('.modal-tab').forEach((t, i) => t.classList.toggle('active', (tab === 'queue') === (i === 0)));
             document.getElementById('tabQueue').classList.toggle('active', tab === 'queue');
@@ -992,6 +1014,7 @@
             if (tab === 'more') updateMorePage();
             equalizeTabHeight();
             document.getElementById('tab' + (tab === 'queue' ? 'Queue' : 'More')).classList.add('active');
+            moveIndicator();
         }
 
         // Voice settings
