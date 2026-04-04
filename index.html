@@ -437,17 +437,8 @@
             margin-bottom: 1.2rem;
             flex-shrink: 0;
             align-items: center;
-            position: relative;
         }
 
-        .modal-tabs-indicator {
-            position: absolute;
-            bottom: 0;
-            height: 2px;
-            background: var(--text-primary);
-            border-radius: 1px;
-            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
 
         .auto-queue-toggle {
             margin-left: auto;
@@ -700,7 +691,7 @@
         }
 
         .profile-chip.add-new {
-            background: rgba(0, 255, 136, 0.1);
+            background: color-mix(in srgb, var(--accent-work) 15%, transparent);
             border: none;
             color: var(--accent-work);
             width: 40px;
@@ -889,11 +880,10 @@
         <div class="modal-content" onclick="clearDeleteMode(event);">
             <div class="modal-handle"></div>
 
-            <div class="modal-tabs" id="modalTabs">
+            <div class="modal-tabs">
                 <div class="modal-tab active" onclick="switchTab('queue')">队列</div>
                 <div class="modal-tab" onclick="switchTab('more')">更多</div>
                 <div class="auto-queue-toggle" id="toggleAutoQueue" onclick="toggleDisplay('autoQueue')">连练模式</div>
-                <div class="modal-tabs-indicator" id="tabIndicator"></div>
             </div>
 
             <!-- 队列页 -->
@@ -936,7 +926,7 @@
                     <div class="more-options">
                         <div class="voice-toggle active" id="voiceStartToggle" onclick="toggleVoice('start')">开始</div>
                         <div class="voice-toggle active" id="voiceRestToggle" onclick="toggleVoice('rest')">休息</div>
-                        <span style="width:1px;height:16px;background:var(--border-color);margin:0 0.2rem"></span>
+                        <span style="width:1px;align-self:stretch;background:var(--border-color);margin:0 0.3rem;border-radius:1px"></span>
                         <div class="more-option active" id="voiceMale" onclick="setVoiceGender('male')">男声</div>
                         <div class="more-option" id="voiceFemale" onclick="setVoiceGender('female')">女声</div>
                     </div>
@@ -995,16 +985,6 @@
             // Restore correct visibility after measuring
             q.classList.remove('active'); m.classList.remove('active');
         }
-        function moveIndicator() {
-            const activeTab = document.querySelector('.modal-tab.active');
-            const indicator = document.getElementById('tabIndicator');
-            const tabs = document.getElementById('modalTabs');
-            if (!activeTab || !indicator || !tabs) return;
-            const tabsRect = tabs.getBoundingClientRect();
-            const tabRect = activeTab.getBoundingClientRect();
-            indicator.style.left = (tabRect.left - tabsRect.left) + 'px';
-            indicator.style.width = tabRect.width + 'px';
-        }
         function switchTab(tab) {
             document.querySelectorAll('.modal-tab').forEach((t, i) => t.classList.toggle('active', (tab === 'queue') === (i === 0)));
             document.getElementById('tabQueue').classList.toggle('active', tab === 'queue');
@@ -1012,7 +992,6 @@
             if (tab === 'more') updateMorePage();
             equalizeTabHeight();
             document.getElementById('tab' + (tab === 'queue' ? 'Queue' : 'More')).classList.add('active');
-            moveIndicator();
         }
 
         // Voice settings
@@ -1482,7 +1461,7 @@
                 utter.rate = 1.1;
                 utter.volume = 0.9;
                 // 根据性别选择音高
-                utter.pitch = voiceSettings.gender === 'female' ? 1.4 : 0.8;
+                utter.pitch = voiceSettings.gender === 'female' ? 1.15 : 0.9;
                 const voices = window.speechSynthesis.getVoices();
                 const zhVoices = voices.filter(v => v.lang.startsWith('zh'));
                 if (zhVoices.length) {
@@ -1602,7 +1581,7 @@
             const sheet = document.querySelector('.modal-content');
             let startX = 0, startY = 0, currentY = 0, dragging = false, decided = false;
             sheet.addEventListener('touchstart', (e) => {
-                if (sheet.scrollTop > 0) return;
+                if (sheet.scrollTop > 0 || e.target.closest('input[type="range"]')) return;
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
                 dragging = false;
