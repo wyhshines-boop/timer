@@ -12,7 +12,9 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@700&family=Archivo+Black&family=Orbitron:wght@700&family=Righteous&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-color: #0a0a0b;
@@ -24,6 +26,8 @@
             --accent-rest: #ffbb00;
             --accent-done: #00d2ff;
             --accent-ready: #ffffff;
+            --glow-1: rgba(0, 255, 136, 0.05);
+            --glow-2: rgba(0, 210, 255, 0.05);
             --glass-blur: 15px;
         }
 
@@ -37,8 +41,8 @@
         body {
             background-color: var(--bg-color);
             background-image:
-                radial-gradient(circle at 20% 30%, rgba(0, 255, 136, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(0, 210, 255, 0.05) 0%, transparent 40%);
+                radial-gradient(circle at 20% 30%, var(--glow-1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, var(--glow-2) 0%, transparent 40%);
             color: var(--text-primary);
             font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
@@ -48,7 +52,11 @@
             min-height: 100vh;
             user-select: none;
             overflow: hidden;
-            transition: background 0.5s ease;
+            transition: background-image 0.5s ease, background-color 0.5s ease;
+        }
+
+        body.no-glow {
+            background-image: none !important;
         }
 
         /* App Container */
@@ -242,6 +250,14 @@
             border-radius: 5px;
             margin-bottom: 3rem;
             overflow: hidden;
+            opacity: 0;
+            transform: scaleX(0.6);
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-box.visible {
+            opacity: 1;
+            transform: scaleX(1);
         }
 
         .progress-bar {
@@ -411,8 +427,142 @@
             height: 5px;
             background: rgba(255, 255, 255, 0.3);
             border-radius: 3px;
-            margin: 10px auto 16px;
+            margin: 10px auto 12px;
             flex-shrink: 0;
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.2rem;
+            flex-shrink: 0;
+            align-items: center;
+            position: relative;
+        }
+
+        .modal-tabs-indicator {
+            position: absolute;
+            bottom: 0;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 1px;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .auto-queue-toggle {
+            margin-left: auto;
+            padding: 0.35rem 0.9rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .auto-queue-toggle.active {
+            background: #ffbb00;
+            color: #000;
+        }
+
+        .modal-tab {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding-bottom: 6px;
+            transition: color 0.25s;
+        }
+
+        .modal-tab.active {
+            color: var(--text-primary);
+        }
+
+        .tab-page {
+            display: none;
+            flex-direction: column;
+        }
+
+        .tab-page.active {
+            display: flex;
+        }
+
+        .more-section {
+            margin-bottom: 1.2rem;
+        }
+
+        .more-section-title {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.6rem;
+        }
+
+        .more-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .more-option {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .more-option.active {
+            background: var(--text-primary);
+            color: #000;
+        }
+
+        .theme-options {
+            display: flex;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+        }
+
+        .theme-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2.5px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .theme-dot.active {
+            border-color: var(--text-primary);
+            transform: scale(1.15);
+        }
+
+        .font-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .font-option {
+            padding: 0.6rem 0;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .font-option.active {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
         }
 
         /* Profile Selector */
@@ -585,7 +735,7 @@
         .setting-group input {
             width: 100%;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
+            border: 1px solid #282829;
             padding: 0.8rem 1.2rem;
             border-radius: 14px;
             color: var(--text-primary);
@@ -597,6 +747,28 @@
 
         .setting-group input:focus {
             border-color: var(--accent-work);
+        }
+
+        .setting-group input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            border: none;
+            padding: 0;
+            margin: 0.8rem 0 0.4rem;
+            outline: none;
+        }
+
+        .setting-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-work);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
         }
 
         .voice-toggles {
@@ -701,7 +873,7 @@
             </div>
         </div>
 
-        <div class="progress-box">
+        <div class="progress-box" id="progressBox">
             <div class="progress-bar" id="progressBar"></div>
         </div>
 
@@ -716,52 +888,138 @@
         <div class="modal-backdrop" onclick="clearDeleteMode(event); closeModal()"></div>
         <div class="modal-content" onclick="clearDeleteMode(event);">
             <div class="modal-handle"></div>
-            <div class="profile-selector" id="profileSelector">
-                <!-- Chips added via JS -->
+
+            <div class="modal-tabs" id="modalTabs">
+                <div class="modal-tab active" onclick="switchTab('queue')">队列</div>
+                <div class="modal-tab" onclick="switchTab('more')">更多</div>
+                <div class="auto-queue-toggle" id="toggleAutoQueue" onclick="toggleDisplay('autoQueue')">连练模式</div>
+                <div class="modal-tabs-indicator" id="tabIndicator"></div>
             </div>
 
-            <div class="setting-group">
-                <label for="projectName">项目名称</label>
-                <input type="text" id="projectName" placeholder="例如：收下巴训练" maxlength="20">
-            </div>
+            <!-- 队列页 -->
+            <div class="tab-page active" id="tabQueue">
+                <div class="profile-selector" id="profileSelector">
+                    <!-- Chips added via JS -->
+                </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="setting-group">
-                    <label for="holdTime">训练时长 (秒)</label>
-                    <input type="number" id="holdTime" min="1" max="3600">
+                    <label for="projectName">项目名称</label>
+                    <input type="text" id="projectName" placeholder="例如：收下巴训练" maxlength="20">
                 </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="setting-group">
+                        <label for="holdTime">训练时长 (秒)</label>
+                        <input type="number" id="holdTime" min="1" max="3600">
+                    </div>
+                    <div class="setting-group">
+                        <label for="restTime">休息时长 (秒)</label>
+                        <input type="number" id="restTime" min="0" max="3600">
+                    </div>
+                </div>
+
                 <div class="setting-group">
-                    <label for="restTime">休息时长 (秒)</label>
-                    <input type="number" id="restTime" min="0" max="3600">
+                    <label for="totalReps">总轮数 <span id="repsValue" onclick="editRepsManually()" style="float:right;color:var(--text-primary);font-weight:700;cursor:pointer;min-width:1.5em;text-align:right"></span></label>
+                    <input type="range" id="totalReps" min="1" max="50" step="1">
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveSettings()">保存计划</button>
                 </div>
             </div>
 
-            <div class="setting-group">
-                <label for="totalReps">总轮数</label>
-                <input type="number" id="totalReps" min="1" max="999">
-            </div>
-
-            <div class="setting-group">
-                <label>语音播报</label>
-                <div class="voice-toggles">
-                    <div class="voice-toggle active" id="voiceStartToggle" onclick="toggleVoice('start')">开始</div>
-                    <div class="voice-toggle active" id="voiceRestToggle" onclick="toggleVoice('rest')">休息</div>
+            <!-- 更多页 -->
+            <div class="tab-page" id="tabMore">
+                <div class="more-section">
+                    <div class="more-section-title">播报</div>
+                    <div class="more-options">
+                        <div class="voice-toggle active" id="voiceStartToggle" onclick="toggleVoice('start')">开始</div>
+                        <div class="voice-toggle active" id="voiceRestToggle" onclick="toggleVoice('rest')">休息</div>
+                        <span style="width:1px;height:16px;background:var(--border-color);margin:0 0.2rem"></span>
+                        <div class="more-option active" id="voiceMale" onclick="setVoiceGender('male')">男声</div>
+                        <div class="more-option" id="voiceFemale" onclick="setVoiceGender('female')">女声</div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
-                <button class="btn btn-primary" onclick="saveSettings()">保存计划</button>
+                <div class="more-section">
+                    <div class="more-section-title">显示</div>
+                    <div class="more-options">
+                        <div class="more-option active" id="toggleProgress" onclick="toggleDisplay('progress')">进度条
+                        </div>
+                        <div class="more-option active" id="toggleGlow" onclick="toggleDisplay('glow')">背景光源</div>
+                    </div>
+                </div>
+
+                <div class="more-section">
+                    <div class="more-section-title">色彩主题</div>
+                    <div class="theme-options" id="themeOptions">
+                        <div class="theme-dot active" style="background:#00ff88" onclick="setTheme('green')"
+                            title="薄荷绿"></div>
+                        <div class="theme-dot" style="background:#00d2ff" onclick="setTheme('cyan')" title="冰蓝"></div>
+                        <div class="theme-dot" style="background:#a78bfa" onclick="setTheme('purple')" title="薰衣紫">
+                        </div>
+                        <div class="theme-dot" style="background:#f472b6" onclick="setTheme('pink')" title="樱花粉"></div>
+                        <div class="theme-dot" style="background:#fb923c" onclick="setTheme('orange')" title="落日橙">
+                        </div>
+                        <div class="theme-dot" style="background:#facc15" onclick="setTheme('yellow')" title="柠檬黄">
+                        </div>
+                        <div class="theme-dot" style="background:#f87171" onclick="setTheme('red')" title="热力红"></div>
+                        <div class="theme-dot" style="background:#ffffff" onclick="setTheme('white')" title="纯白"></div>
+                    </div>
+                </div>
+
+                <div class="more-section">
+                    <div class="more-section-title">数字字体</div>
+                    <div class="font-options" id="fontOptions">
+                        <div class="font-option active" onclick="setFont('space')" data-font="space" style="font-family:'Space Grotesk'">12</div>
+                        <div class="font-option" onclick="setFont('archivo')" data-font="archivo" style="font-family:'Archivo Black'">12</div>
+                        <div class="font-option" onclick="setFont('orbitron')" data-font="orbitron" style="font-family:'Orbitron'">12</div>
+                        <div class="font-option" onclick="setFont('righteous')" data-font="righteous" style="font-family:'Righteous'">12</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Tab switching
+        function equalizeTabHeight() {
+            const q = document.getElementById('tabQueue');
+            const m = document.getElementById('tabMore');
+            q.style.minHeight = ''; m.style.minHeight = '';
+            // Show both briefly to measure
+            q.classList.add('active'); m.classList.add('active');
+            const h = Math.max(q.scrollHeight, m.scrollHeight) + 'px';
+            q.style.minHeight = h; m.style.minHeight = h;
+            // Restore correct visibility after measuring
+            q.classList.remove('active'); m.classList.remove('active');
+        }
+        function moveIndicator() {
+            const activeTab = document.querySelector('.modal-tab.active');
+            const indicator = document.getElementById('tabIndicator');
+            const tabs = document.getElementById('modalTabs');
+            if (!activeTab || !indicator || !tabs) return;
+            const tabsRect = tabs.getBoundingClientRect();
+            const tabRect = activeTab.getBoundingClientRect();
+            indicator.style.left = (tabRect.left - tabsRect.left) + 'px';
+            indicator.style.width = tabRect.width + 'px';
+        }
+        function switchTab(tab) {
+            document.querySelectorAll('.modal-tab').forEach((t, i) => t.classList.toggle('active', (tab === 'queue') === (i === 0)));
+            document.getElementById('tabQueue').classList.toggle('active', tab === 'queue');
+            document.getElementById('tabMore').classList.toggle('active', tab === 'more');
+            if (tab === 'more') updateMorePage();
+            equalizeTabHeight();
+            document.getElementById('tab' + (tab === 'queue' ? 'Queue' : 'More')).classList.add('active');
+            moveIndicator();
+        }
+
         // Voice settings
-        let voiceSettings = { start: true, rest: true };
+        let voiceSettings = { start: true, rest: true, gender: 'male' };
         function loadVoiceSettings() {
             const saved = localStorage.getItem('voiceSettings');
-            if (saved) voiceSettings = JSON.parse(saved);
+            if (saved) voiceSettings = { ...voiceSettings, ...JSON.parse(saved) };
         }
         function saveVoiceSettings() {
             localStorage.setItem('voiceSettings', JSON.stringify(voiceSettings));
@@ -771,10 +1029,91 @@
             saveVoiceSettings();
             updateVoiceToggles();
         }
+        function setVoiceGender(gender) {
+            voiceSettings.gender = gender;
+            saveVoiceSettings();
+            updateMorePage();
+        }
         function updateVoiceToggles() {
             document.getElementById('voiceStartToggle').classList.toggle('active', voiceSettings.start);
             document.getElementById('voiceRestToggle').classList.toggle('active', voiceSettings.rest);
         }
+        function updateMorePage() {
+            updateVoiceToggles();
+            document.getElementById('voiceMale').classList.toggle('active', voiceSettings.gender === 'male');
+            document.getElementById('voiceFemale').classList.toggle('active', voiceSettings.gender === 'female');
+            document.getElementById('toggleAutoQueue').classList.toggle('active', displaySettings.autoQueue);
+            document.getElementById('toggleProgress').classList.toggle('active', displaySettings.progress);
+            document.getElementById('toggleGlow').classList.toggle('active', displaySettings.glow);
+            document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+            const activeThemeDot = document.querySelector(`.theme-dot[onclick="setTheme('${currentTheme}')"]`);
+            if (activeThemeDot) activeThemeDot.classList.add('active');
+            document.querySelectorAll('.font-option').forEach(f => f.classList.toggle('active', f.dataset.font === currentFont));
+        }
+
+        // Theme settings
+        const themes = {
+            green: { work: '#00ff88', rest: '#ffbb00', done: '#00d2ff', glow: '0,255,136' },
+            cyan: { work: '#00d2ff', rest: '#ffbb00', done: '#a78bfa', glow: '0,210,255' },
+            purple: { work: '#a78bfa', rest: '#ffbb00', done: '#00d2ff', glow: '167,139,250' },
+            pink: { work: '#f472b6', rest: '#ffbb00', done: '#00d2ff', glow: '244,114,182' },
+            orange: { work: '#fb923c', rest: '#facc15', done: '#00d2ff', glow: '251,146,60' },
+            yellow: { work: '#facc15', rest: '#fb923c', done: '#00d2ff', glow: '250,204,21' },
+            red: { work: '#f87171', rest: '#ffbb00', done: '#00d2ff', glow: '248,113,113' },
+            white: { work: '#ffffff', rest: '#ffbb00', done: '#00d2ff', glow: '255,255,255' }
+        };
+        let currentTheme = localStorage.getItem('colorTheme') || 'green';
+        function setTheme(name) {
+            currentTheme = name;
+            localStorage.setItem('colorTheme', name);
+            applyTheme();
+            updateMorePage();
+        }
+        function applyTheme() {
+            const t = themes[currentTheme] || themes.green;
+            const s = document.documentElement.style;
+            s.setProperty('--accent-work', t.work);
+            s.setProperty('--accent-rest', t.rest);
+            s.setProperty('--accent-done', t.done);
+            s.setProperty('--glow-1', `rgba(${t.glow},0.12)`);
+            s.setProperty('--glow-2', `rgba(${t.glow},0.07)`);
+        }
+        applyTheme();
+
+        // Font settings
+        const fontMap = {
+            space:     "'Space Grotesk', monospace",
+            archivo:   "'Archivo Black', sans-serif",
+            orbitron:  "'Orbitron', monospace",
+            righteous: "'Righteous', cursive"
+        };
+        let currentFont = localStorage.getItem('countdownFont') || 'space';
+        function setFont(name) {
+            currentFont = name;
+            localStorage.setItem('countdownFont', name);
+            applyFont();
+            updateMorePage();
+        }
+        function applyFont() {
+            document.querySelector('.countdown').style.fontFamily = fontMap[currentFont] || fontMap.space;
+        }
+
+        // Display toggles
+        let displaySettings = { progress: true, glow: true, autoQueue: false };
+        (function loadDisplaySettings() {
+            const saved = localStorage.getItem('displaySettings');
+            if (saved) displaySettings = { ...displaySettings, ...JSON.parse(saved) };
+        })();
+        function toggleDisplay(key) {
+            displaySettings[key] = !displaySettings[key];
+            localStorage.setItem('displaySettings', JSON.stringify(displaySettings));
+            applyDisplaySettings();
+            updateMorePage();
+        }
+        function applyDisplaySettings() {
+            document.body.classList.toggle('no-glow', !displaySettings.glow);
+        }
+        applyDisplaySettings();
         loadVoiceSettings();
 
         // Global Profiles State
@@ -814,6 +1153,20 @@
                 reps: document.getElementById('totalReps')
             }
         };
+
+        function updateRepsValue() {
+            document.getElementById('repsValue').textContent = els.inputs.reps.value;
+        }
+        els.inputs.reps.addEventListener('input', updateRepsValue);
+        function editRepsManually() {
+            const val = prompt('输入总轮数', els.inputs.reps.value);
+            if (val === null) return;
+            const n = parseInt(val);
+            if (!n || n < 1) return;
+            els.inputs.reps.max = Math.max(50, n);
+            els.inputs.reps.value = n;
+            updateRepsValue();
+        }
 
         // Get currently editing config
         function getActiveConfig() {
@@ -993,6 +1346,7 @@
             els.inputs.hold.value = config.holdTime;
             els.inputs.rest.value = config.restTime;
             els.inputs.reps.value = config.totalReps;
+            updateRepsValue();
         }
 
         function addNewProfile() {
@@ -1086,6 +1440,8 @@
                 els.mainBtn.classList.remove('pause');
             }
             if (state.isPaused) { els.mainBtn.textContent = '继 续'; els.mainBtn.classList.remove('pause'); }
+            const showBar = displaySettings.progress && state.phase !== 'ready';
+            document.getElementById('progressBox').classList.toggle('visible', showBar);
         }
 
         let audioCtx = null;
@@ -1112,6 +1468,12 @@
         }
 
         // 中文语音播报
+        function warmupSpeech() {
+            if (!('speechSynthesis' in window)) return;
+            const utter = new SpeechSynthesisUtterance('');
+            utter.volume = 0;
+            window.speechSynthesis.speak(utter);
+        }
         function speak(text) {
             try {
                 if (!('speechSynthesis' in window)) return;
@@ -1119,6 +1481,14 @@
                 utter.lang = 'zh-CN';
                 utter.rate = 1.1;
                 utter.volume = 0.9;
+                // 根据性别选择音高
+                utter.pitch = voiceSettings.gender === 'female' ? 1.4 : 0.8;
+                const voices = window.speechSynthesis.getVoices();
+                const zhVoices = voices.filter(v => v.lang.startsWith('zh'));
+                if (zhVoices.length) {
+                    const preferred = zhVoices.find(v => voiceSettings.gender === 'female' ? /female|女/i.test(v.name) : /male|男/i.test(v.name));
+                    utter.voice = preferred || zhVoices[0];
+                }
                 window.speechSynthesis.speak(utter);
             } catch (e) { console.error("Speech Error:", e); }
         }
@@ -1174,17 +1544,57 @@
             else pauseTimer();
         }
 
+        // Wake Lock - 防止计时期间锁屏
+        let wakeLock = null;
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen');
+            } catch (e) { }
+        }
+        function releaseWakeLock() {
+            if (wakeLock) { wakeLock.release(); wakeLock = null; }
+        }
+
         function prepareTimer() {
+            warmupSpeech(); requestWakeLock();
             state.phase = 'prepare'; state.timeLeft = 3; state.currentRep = 1; state.isPaused = false;
             els.mainBtn.textContent = '准 备...'; els.mainBtn.classList.add('pause'); els.resetBtn.style.display = 'block';
             updateDisplay(); state.intervalId = setInterval(tick, 1000);
         }
 
-        function pauseTimer() { state.isPaused = true; els.mainBtn.textContent = '继 续'; els.mainBtn.classList.remove('pause'); clearInterval(state.intervalId); state.intervalId = null; }
-        function resumeTimer() { state.isPaused = false; els.mainBtn.textContent = '暂 停'; els.mainBtn.classList.add('pause'); state.intervalId = setInterval(tick, 1000); }
-        function endTimer() { state.phase = 'done'; state.timeLeft = 0; clearInterval(state.intervalId); state.intervalId = null; els.mainBtn.textContent = '再练一局'; els.mainBtn.classList.remove('pause'); els.resetBtn.style.display = 'block'; playSound('done'); updateDisplay(); }
-        function resetTimer() { clearInterval(state.intervalId); state.intervalId = null; state.phase = 'ready'; state.currentRep = 1; state.timeLeft = getActiveConfig().holdTime; state.isPaused = false; els.mainBtn.textContent = '开 始'; els.mainBtn.classList.remove('pause'); els.resetBtn.style.display = 'none'; updateDisplay(); }
-        function openModal() { if (state.phase !== 'ready' && state.phase !== 'done') pauseTimer(); applyActiveProfile(); updateVoiceToggles(); els.modal.classList.add('active'); }
+        function pauseTimer() { state.isPaused = true; els.mainBtn.textContent = '继 续'; els.mainBtn.classList.remove('pause'); clearInterval(state.intervalId); state.intervalId = null; releaseWakeLock(); }
+        function resumeTimer() { state.isPaused = false; els.mainBtn.textContent = '暂 停'; els.mainBtn.classList.add('pause'); state.intervalId = setInterval(tick, 1000); requestWakeLock(); }
+        function endTimer() {
+            clearInterval(state.intervalId); state.intervalId = null;
+            // 连练模式：尝试跳到下一个任务
+            if (displaySettings.autoQueue && profiles.length > 1) {
+                const idx = profiles.findIndex(p => p.id === activeProfileId);
+                const nextIdx = idx + 1;
+                if (nextIdx < profiles.length) {
+                    playSound('done');
+                    speak((profiles[nextIdx].name || profiles[nextIdx].projectName) + '，准备');
+                    activeProfileId = profiles[nextIdx].id;
+                    localStorage.setItem('activeProfileId', activeProfileId);
+                    applyActiveProfile();
+                    renderProfileChips();
+                    renderQuickSwitchList();
+                    prepareTimer();
+                    return;
+                }
+            }
+            // 全部完成或未开启连练模式
+            if (displaySettings.autoQueue && profiles.length > 1) {
+                // 整个队列跑完，回到第一个任务以便重新开始
+                activeProfileId = profiles[0].id;
+                localStorage.setItem('activeProfileId', activeProfileId);
+                applyActiveProfile(); renderProfileChips(); renderQuickSwitchList();
+            }
+            state.phase = 'done'; state.timeLeft = 0;
+            els.mainBtn.textContent = '再练一局'; els.mainBtn.classList.remove('pause');
+            els.resetBtn.style.display = 'block'; playSound('done'); updateDisplay(); releaseWakeLock();
+        }
+        function resetTimer() { clearInterval(state.intervalId); state.intervalId = null; state.phase = 'ready'; state.currentRep = 1; state.timeLeft = getActiveConfig().holdTime; state.isPaused = false; els.mainBtn.textContent = '开 始'; els.mainBtn.classList.remove('pause'); els.resetBtn.style.display = 'none'; updateDisplay(); releaseWakeLock(); }
+        function openModal() { if (state.phase !== 'ready' && state.phase !== 'done') pauseTimer(); applyActiveProfile(); els.modal.classList.add('active'); requestAnimationFrame(() => switchTab('queue')); }
         function closeModal() { els.modal.classList.remove('active'); clearDeleteMode(); }
 
         // Swipe down to dismiss
@@ -1213,6 +1623,7 @@
             });
         })();
         init();
+        applyFont();
 
         // Register Service Worker
         if ('serviceWorker' in navigator) {
