@@ -1581,7 +1581,9 @@
             const sheet = document.querySelector('.modal-content');
             let startX = 0, startY = 0, currentY = 0, dragging = false, decided = false;
             sheet.addEventListener('touchstart', (e) => {
-                if (sheet.scrollTop > 0 || e.target.closest('input[type="range"]')) return;
+                if (sheet.scrollTop > 0 || e.target.closest('input[type="range"]')) {
+                    decided = true; dragging = false; return;
+                }
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
                 dragging = false;
