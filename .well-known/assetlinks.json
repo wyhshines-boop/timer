@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.timer_silk_gamma.twa",
+      "sha256_cert_fingerprints": [
+        "94:DB:F3:C7:68:26:52:44:97:47:38:36:85:4A:52:E0:07:EC:DA:CF:29:4D:60:DA:D2:8D:3B:A4:ED:10:29:87"
+      ]
+    }
+  }
+]
