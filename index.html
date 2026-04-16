@@ -7,7 +7,8 @@
     <meta name="theme-color" content="#0a0a0b">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" href="icons/Group 1000003232 (1).jpg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="icons/Group 1000003232 (1).jpg">
     <title id="pageTitle">训练计时器</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -358,18 +359,185 @@
             justify-content: center;
             cursor: pointer;
             z-index: 100;
-            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.82);
+            transition: color 0.22s ease;
         }
 
         .settings-toggle:hover {
-            /* background: rgba(255, 255, 255, 0.1); */
-            transform: rotate(45deg);
+            color: #fff;
         }
 
         .settings-toggle svg {
-            fill: var(--text-primary);
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
+        }
+
+        /* Reports Toggle */
+        .reports-toggle {
+            position: fixed;
+            top: 2rem;
+            right: calc(4rem + 50px);
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            color: rgba(255, 255, 255, 0.82);
+            transition: color 0.22s ease;
+        }
+
+        .reports-toggle:hover {
+            color: #fff;
+        }
+
+        .reports-toggle svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        /* Report View Styles */
+        .reports-container {
+            padding: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            padding: 1.5rem 1.2rem;
+            height: 180px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 8px;
+            position: relative;
+        }
+
+        .chart-bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .chart-bar {
+            width: 100%;
+            max-width: 30px;
+            background: var(--text-primary);
+            border-radius: 6px 6px 2px 2px;
+            min-height: 4px;
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .chart-bar.today {
+            background: var(--accent-work);
+            box-shadow: 0 0 15px var(--glow-1);
+        }
+
+        .chart-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        .log-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            margin-bottom: 0.8rem;
+        }
+
+        .log-time {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            width: 45px;
+        }
+
+        .log-info {
+            flex: 1;
+        }
+
+        .log-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .log-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .report-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .report-nav-btn {
+            background: transparent;
+            border: none;
+            width: 40px;
+            height: 40px;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: filter 0.3s ease;
+        }
+
+        .report-nav-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            filter: brightness(1.5);
+        }
+
+        .report-empty {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
         }
 
         /* Modal Settings */
@@ -409,13 +577,22 @@
             max-height: 90vh;
             overflow-y: auto;
             transform: translateY(100%);
-            transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+            transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+                        height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: column;
             max-width: 600px;
             margin: 0 auto;
             -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-content.transitioning {
+            overflow: hidden !important;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            display: none;
         }
 
         .modal.active .modal-content {
@@ -450,9 +627,18 @@
             pointer-events: none;
         }
 
-
-        .auto-queue-toggle {
+        .modal-tab-actions {
             margin-left: auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.55rem;
+            min-width: 112px;
+            flex-shrink: 0;
+        }
+
+        .profile-edit-toggle,
+        .auto-queue-toggle {
             padding: 0.35rem 0.9rem;
             background: rgba(255, 255, 255, 0.08);
             border: none;
@@ -461,6 +647,46 @@
             font-size: 0.78rem;
             color: var(--text-secondary);
             transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .profile-edit-toggle {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease, background 0.22s ease, color 0.22s ease;
+        }
+
+        .profile-edit-toggle svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+        }
+
+        .profile-edit-toggle,
+        .auto-queue-toggle {
+            white-space: nowrap;
+        }
+
+        .profile-edit-toggle.active {
+            background: rgba(255, 255, 255, 0.14);
+            color: var(--text-primary);
+            filter: brightness(1.2);
+        }
+
+        .profile-edit-toggle.is-hidden {
+            visibility: hidden;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.88);
         }
 
         .auto-queue-toggle.active {
@@ -475,6 +701,7 @@
             cursor: pointer;
             padding-bottom: 6px;
             transition: color 0.25s;
+            white-space: nowrap;
         }
 
         .modal-tab.active {
@@ -484,10 +711,13 @@
         .tab-page {
             display: none;
             flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
         .tab-page.active {
             display: flex;
+            opacity: 1;
         }
 
         .more-section {
@@ -601,6 +831,16 @@
             justify-content: center;
             flex-shrink: 0;
             overflow: hidden;
+            transform-origin: center;
+            transition:
+                width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                margin 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.22s ease,
+                transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.22s ease,
+                background 0.22s ease,
+                color 0.22s ease;
         }
 
         /* Targeted animations */
@@ -625,62 +865,71 @@
         }
 
         .profile-chip.removing {
-            animation: chip-pop-out 0.3s forwards cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
-        }
-
-        @keyframes chip-pop-out {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(0.5);
-                opacity: 0;
-                width: 0;
-                margin: 0;
-                padding: 0;
-            }
-        }
-
-        .chip-content {
-            position: relative;
-            display: grid;
-            grid-template-areas: "overlay";
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
+            width: 0 !important;
+            min-width: 0 !important;
+            margin-right: -0.8rem;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            border-width: 0;
+            opacity: 0;
+            transform: scale(0.86);
         }
 
         .chip-label {
-            grid-area: overlay;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 1;
-            transform: translateY(0);
             pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease;
         }
 
-        .chip-delete-label {
-            grid-area: overlay;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .profile-chip.editing {
+            padding-right: 2.4rem;
+        }
+
+        .chip-delete-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%) scale(0.85);
+            width: 22px;
+            height: 22px;
+            border: none;
+            background: transparent;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
             opacity: 0;
-            transform: translateY(10px);
-            color: inherit;
-            font-weight: 700;
             pointer-events: none;
-            white-space: nowrap;
+            font-family: inherit;
+            padding: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
         }
 
-        .profile-chip.deletable .chip-label {
-            opacity: 0;
-            transform: translateY(-10px);
+        .chip-delete-btn svg {
+            display: block;
+            width: 14px;
+            height: 14px;
         }
 
-        .profile-chip.deletable .chip-delete-label {
+        .profile-chip.editing .chip-delete-btn {
             opacity: 1;
-            transform: translateY(0);
+            pointer-events: auto;
+            transform: translateY(-50%) scale(1);
+        }
+
+        .profile-chip.active .chip-delete-btn {
+            color: var(--bg-color);
+        }
+
+        .profile-chip.removing .chip-label,
+        .profile-chip.removing .chip-delete-btn {
+            opacity: 0;
+            transform: translateY(-50%) scale(0.82);
+        }
+
+        .profile-chip.removing .chip-label {
+            transform: scale(0.94);
         }
 
         .profile-chip.active {
@@ -688,17 +937,6 @@
             color: var(--bg-color);
             border-color: var(--text-primary);
             font-weight: 700;
-        }
-
-        .profile-chip.deletable {
-            background: rgba(255, 68, 68, 0.15) !important;
-            border-color: rgba(255, 68, 68, 0.5) !important;
-            color: #ff4444 !important;
-        }
-
-        .profile-chip.deletable.active {
-            background: #ff4444 !important;
-            color: white !important;
         }
 
         .profile-chip.add-new {
@@ -837,7 +1075,79 @@
             animation: pulse 1s infinite ease-in-out;
         }
 
+        /* About Page Styles */
+        .about-content {
+            padding: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .version-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+            width: fit-content;
+        }
+
+        .about-desc {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+
+        .contact-email:hover {
+            color: var(--accent-work);
+        }
+
+        .about-contact {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .about-contact a {
+            color: var(--text-primary);
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+
+        .about-contact a:hover {
+            color: var(--accent-work);
+        }
+
         @media (max-width: 480px) {
+            .settings-toggle {
+                right: 1rem;
+            }
+
+            .reports-toggle {
+                right: 3.9rem;
+            }
+
+            .modal-tabs {
+                gap: 0.8rem;
+            }
+
+            .modal-tab {
+                font-size: 1rem;
+            }
+
+            .modal-tab-actions {
+                gap: 0.35rem;
+                min-width: 92px;
+            }
+
+            .auto-queue-toggle {
+                padding: 0.35rem 0.7rem;
+                font-size: 0.72rem;
+            }
+
             .container {
                 padding: 1rem;
             }
@@ -849,13 +1159,26 @@
     </style>
 </head>
 
-<body onclick="clearDeleteMode(event)">
+<body onclick="clearDeleteMode()">
+
+    <!-- Reports Trigger -->
+    <div class="reports-toggle" onclick="openReports()" title="报表">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48">
+            <g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="3.5">
+                <path d="M5 7a3 3 0 0 1 3-3h24a3 3 0 0 1 3 3v37H8a3 3 0 0 1-3-3zm30 17a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v17a3 3 0 0 1-3 3h-5z" />
+                <path stroke-linecap="round" d="M11 12h8m-8 7h12" />
+            </g>
+        </svg>
+    </div>
 
     <!-- Settings Trigger -->
     <div class="settings-toggle" onclick="openModal()" title="设置">
-        <svg viewBox="0 0 24 24">
-            <path
-                d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+        <svg viewBox="0 0 115 99" fill="none">
+            <circle cx="22.5" cy="20.5" r="18.5" stroke="currentColor" stroke-width="6" />
+            <circle cx="20.5" cy="20.5" r="18.5" transform="matrix(-1 0 0 1 113 58)" stroke="currentColor"
+                stroke-width="6" />
+            <path d="M48 20H113" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+            <path d="M67 78H2" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
         </svg>
     </div>
 
@@ -887,14 +1210,23 @@
 
     <!-- Settings Modal -->
     <div class="modal" id="settingsModal">
-        <div class="modal-backdrop" onclick="clearDeleteMode(event); closeModal()"></div>
-        <div class="modal-content" onclick="clearDeleteMode(event);">
+        <div class="modal-backdrop" onclick="clearDeleteMode(); closeModal()"></div>
+        <div class="modal-content">
             <div class="modal-handle"></div>
 
             <div class="modal-tabs">
                 <div class="modal-tab active" onclick="switchTab('queue')">队列</div>
                 <div class="modal-tab" onclick="switchTab('more')">个性化</div>
-                <div class="auto-queue-toggle" id="toggleAutoQueue" onclick="toggleDisplay('autoQueue')">连练模式</div>
+                <div class="modal-tab" onclick="switchTab('about')">关于</div>
+                <div class="modal-tab-actions">
+                    <button class="profile-edit-toggle is-hidden" id="toggleProfileEdit" onclick="toggleProfileEditMode(event)" type="button" aria-label="编辑计划">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" aria-hidden="true">
+                            <path fill="currentColor" d="M33.87 8.32L28 2.42a2.07 2.07 0 0 0-2.92 0L4.27 23.2l-1.9 8.2a2.06 2.06 0 0 0 2 2.5a2 2 0 0 0 .43 0l8.29-1.9l20.78-20.76a2.07 2.07 0 0 0 0-2.92M12.09 30.2l-7.77 1.63l1.77-7.62L21.66 8.7l6 6ZM29 13.25l-6-6l3.48-3.46l5.9 6Z"/>
+                            <path fill="none" d="M0 0h36v36H0z"/>
+                        </svg>
+                    </button>
+                    <div class="auto-queue-toggle" id="toggleAutoQueue" onclick="toggleDisplay('autoQueue')">连练模式</div>
+                </div>
                 <div class="modal-tabs-indicator" id="tabIndicator"></div>
             </div>
 
@@ -905,30 +1237,29 @@
                 </div>
 
                 <div class="setting-group">
-                    <label for="projectName">项目名称</label>
-                    <input type="text" id="projectName" placeholder="例如：收下巴训练" maxlength="20">
+                    <label>项目名称</label>
+                    <input type="text" id="projectName" placeholder="例如：收下巴训练" maxlength="20" 
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text">
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="setting-group">
-                        <label for="holdTime">训练时长 (秒)</label>
-                        <input type="number" id="holdTime" min="1" max="3600">
+                        <label>训练时长 (秒)</label>
+                        <input type="number" id="holdTime" min="1" max="3600" 
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="numeric">
                     </div>
                     <div class="setting-group">
-                        <label for="restTime">休息时长 (秒)</label>
-                        <input type="number" id="restTime" min="0" max="3600">
+                        <label>休息时长 (秒)</label>
+                        <input type="number" id="restTime" min="0" max="3600" 
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="numeric">
                     </div>
                 </div>
 
                 <div class="setting-group">
-                    <label for="totalReps">总轮数 <span id="repsValue" onclick="editRepsManually()" style="float:right;color:var(--text-primary);font-weight:700;cursor:pointer;min-width:1.5em;text-align:right"></span></label>
+                    <label>总轮数 <span id="repsValue" onclick="editRepsManually()" style="float:right;color:var(--text-primary);font-weight:700;cursor:pointer;min-width:1.5em;text-align:right"></span></label>
                     <input type="range" id="totalReps" min="1" max="50" step="1">
                 </div>
 
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
-                    <button class="btn btn-primary" onclick="saveSettings()">保存计划</button>
-                </div>
             </div>
 
             <!-- 更多页 -->
@@ -956,7 +1287,8 @@
                 <div class="more-section">
                     <div class="more-section-title">色彩主题</div>
                     <div class="theme-options" id="themeOptions">
-                        <div class="theme-dot active" style="background:#00ff88" onclick="setTheme('green')"
+                        <div class="theme-dot active" style="background:#ffffff" onclick="setTheme('white')" title="纯白"></div>
+                        <div class="theme-dot" style="background:#00ff88" onclick="setTheme('green')"
                             title="薄荷绿"></div>
                         <div class="theme-dot" style="background:#00d2ff" onclick="setTheme('cyan')" title="冰蓝"></div>
                         <div class="theme-dot" style="background:#a78bfa" onclick="setTheme('purple')" title="薰衣紫">
@@ -967,7 +1299,6 @@
                         <div class="theme-dot" style="background:#facc15" onclick="setTheme('yellow')" title="柠檬黄">
                         </div>
                         <div class="theme-dot" style="background:#f87171" onclick="setTheme('red')" title="热力红"></div>
-                        <div class="theme-dot" style="background:#ffffff" onclick="setTheme('white')" title="纯白"></div>
                     </div>
                 </div>
 
@@ -981,22 +1312,64 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 关于页 -->
+            <div class="tab-page" id="tabAbout">
+                <div class="about-content">
+                    <div class="version-badge">VERSION 1.5.0</div>
+                    <div class="about-desc">
+                        训练计时器是一款专为高强度间歇训练（HIIT）设计的极简 PWA。支持多方案切换、自动连练及语音提示，助您更专注、更高效地完成每一项挑战。
+                    </div>
+                    <p class="about-contact">
+                        建议或问题：<a href="mailto:wyhshines@gmail.com">wyhshines@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Modal -->
+    <div class="modal" id="reportsModal">
+        <div class="modal-backdrop" onclick="closeReports()"></div>
+        <div class="modal-content">
+            <div class="modal-handle"></div>
+            <div class="modal-tabs">
+                <div class="modal-tab active" id="tabReportDaily" onclick="setReportPeriod('daily')">今日</div>
+                <div class="modal-tab" id="tabReportWeekly" onclick="setReportPeriod('weekly')">本周</div>
+                <div class="modal-tab" id="tabReportSummary" onclick="setReportPeriod('monthly')">总结</div>
+                <div class="modal-tabs-indicator" id="reportTabIndicator"></div>
+            </div>
+
+            <div class="reports-container" id="reportsContent">
+                <!-- Content injected via JS -->
+            </div>
         </div>
     </div>
 
     <script>
         // Tab switching
-        function equalizeTabHeight() {
-            const q = document.getElementById('tabQueue');
-            const m = document.getElementById('tabMore');
-            q.style.minHeight = ''; m.style.minHeight = '';
-            // Show both briefly to measure
-            q.classList.add('active'); m.classList.add('active');
-            const h = Math.max(q.scrollHeight, m.scrollHeight) + 'px';
-            q.style.minHeight = h; m.style.minHeight = h;
-            // Restore correct visibility after measuring
-            q.classList.remove('active'); m.classList.remove('active');
+        function updateModalHeight(modalEl = document.getElementById('settingsModal')) {
+            const content = modalEl.querySelector('.modal-content');
+            const activePage = modalEl.querySelector('.tab-page.active') || modalEl.querySelector('.reports-container');
+            if (!content || !activePage) return;
+            
+            // Add transitioning class to hide scrollbar
+            content.classList.add('transitioning');
+            
+            // Temporary height to calculate
+            const headerHeight = modalEl.querySelector('.modal-handle').offsetHeight + 
+                               modalEl.querySelector('.modal-tabs').offsetHeight + 40; // gaps
+            const pageHeight = activePage.scrollHeight;
+            const paddingBottom = 40 + (parseInt(getComputedStyle(content).paddingBottom) || 0);
+            
+            content.style.height = (headerHeight + pageHeight + paddingBottom) + 'px';
+            
+            // Remove after transition finishes (matching 0.3s transition)
+            setTimeout(() => {
+                content.classList.remove('transitioning');
+            }, 400);
         }
+
         function moveIndicator() {
             const activeTab = document.querySelector('.modal-tab.active');
             const indicator = document.getElementById('tabIndicator');
@@ -1007,14 +1380,260 @@
             indicator.style.left = (tabRect.left - tabsRect.left) + 'px';
             indicator.style.width = tabRect.width + 'px';
         }
+
         function switchTab(tab) {
-            document.querySelectorAll('.modal-tab').forEach((t, i) => t.classList.toggle('active', (tab === 'queue') === (i === 0)));
-            document.getElementById('tabQueue').classList.toggle('active', tab === 'queue');
-            document.getElementById('tabMore').classList.toggle('active', tab === 'more');
+            const tabs = ['queue', 'more', 'about'];
+            const index = tabs.indexOf(tab);
+            currentSettingsTab = tab;
+            
+            document.querySelectorAll('.modal-tab').forEach((t, i) => t.classList.toggle('active', i === index));
+            
+            const pQueue = document.getElementById('tabQueue');
+            const pMore = document.getElementById('tabMore');
+            const pAbout = document.getElementById('tabAbout');
+            
+            [pQueue, pMore, pAbout].forEach(p => p.classList.remove('active'));
+            
+            const target = tab === 'queue' ? pQueue : (tab === 'more' ? pMore : pAbout);
+            target.classList.add('active');
+            
             if (tab === 'more') updateMorePage();
-            equalizeTabHeight();
-            document.getElementById('tab' + (tab === 'queue' ? 'Queue' : 'More')).classList.add('active');
+            updateProfileEditButtonVisibility();
             moveIndicator();
+            
+            // Trigger height transition after DOM update
+            requestAnimationFrame(() => updateModalHeight(document.getElementById('settingsModal')));
+        }
+
+        // Reports View Management
+        let reportPeriod = 'daily';
+        let reportDateOffset = 0; // 0 for today/this week
+
+        function openReports() {
+            if (state.phase !== 'ready' && state.phase !== 'done') pauseTimer();
+            els.reportsModal.classList.add('active');
+            requestAnimationFrame(() => {
+                setReportPeriod('daily');
+            });
+        }
+
+        function closeReports() {
+            els.reportsModal.classList.remove('active');
+            setTimeout(() => {
+                document.querySelector('#reportsModal .modal-content').style.height = '';
+            }, 450);
+        }
+
+        function setReportPeriod(period) {
+            reportPeriod = period;
+            reportDateOffset = 0;
+            
+            // Fix ID mapping: monthly maps to Summary tab
+            const tabId = period === 'monthly' ? 'tabReportSummary' : 'tabReport' + period.charAt(0).toUpperCase() + period.slice(1);
+            
+            document.querySelectorAll('#reportsModal .modal-tab').forEach(t => {
+                t.classList.toggle('active', t.id === tabId);
+            });
+            
+            moveReportIndicator();
+            renderReports();
+        }
+
+        function moveReportIndicator() {
+            const activeTab = document.querySelector('#reportsModal .modal-tab.active');
+            const indicator = document.getElementById('reportTabIndicator');
+            const tabs = activeTab && activeTab.parentElement;
+            if (!activeTab || !indicator || !tabs) return;
+            const tabsRect = tabs.getBoundingClientRect();
+            const tabRect = activeTab.getBoundingClientRect();
+            indicator.style.left = (tabRect.left - tabsRect.left) + 'px';
+            indicator.style.width = tabRect.width + 'px';
+        }
+
+        function changeReportOffset(delta) {
+            reportDateOffset += delta;
+            renderReports();
+        }
+
+        // Data Logging
+        function logWorkout() {
+            const config = getActiveConfig();
+            const log = {
+                id: Date.now(),
+                name: config.name || config.projectName,
+                reps: state.currentRep,
+                duration: calculateTotalDuration(config, state.currentRep),
+                timestamp: Date.now()
+            };
+            
+            const logs = JSON.parse(localStorage.getItem('workoutLogs') || '[]');
+            logs.push(log);
+            localStorage.setItem('workoutLogs', JSON.stringify(logs));
+        }
+
+        function calculateTotalDuration(config, reps) {
+            // Simple calculation: (hold + rest) * completed reps
+            // If it's a 'done' state, we count all reps.
+            return reps * config.holdTime + (reps - 1) * config.restTime;
+        }
+
+        function getLogs() {
+            return JSON.parse(localStorage.getItem('workoutLogs') || '[]');
+        }
+
+        function renderReports() {
+            const container = document.getElementById('reportsContent');
+            const logs = getLogs();
+            
+            if (reportPeriod === 'daily') renderDaily(container, logs);
+            else if (reportPeriod === 'weekly') renderWeekly(container, logs);
+            else renderMonthly(container, logs);
+            
+            requestAnimationFrame(() => updateModalHeight(document.getElementById('reportsModal')));
+        }
+
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function renderDaily(container, logs) {
+            const targetDate = new Date();
+            targetDate.setDate(targetDate.getDate() + reportDateOffset);
+            const dateStr = formatDate(targetDate);
+            const displayDate = reportDateOffset === 0 ? '今日' : (reportDateOffset === -1 ? '昨日' : dateStr);
+            
+            const dayLogs = logs.filter(l => formatDate(new Date(l.timestamp)) === dateStr).reverse();
+            
+            let html = `
+                <div class="report-nav">
+                    <button class="report-nav-btn" onclick="changeReportOffset(-1)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <span style="font-weight:700">${displayDate}</span>
+                    <button class="report-nav-btn" onclick="changeReportOffset(1)" ${reportDateOffset >= 0 ? 'disabled style="opacity:0.3"' : ''}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+            `;
+            
+            if (dayLogs.length === 0) {
+                html += `<div class="report-empty">暂无训练记录</div>`;
+            } else {
+                const totalMinutes = Math.round(dayLogs.reduce((s, l) => s + l.duration, 0) / 60);
+                html += `
+                    <div class="stat-grid">
+                        <div class="stat-card"><div class="stat-value">${totalMinutes}</div><div class="stat-label">总分钟</div></div>
+                        <div class="stat-card"><div class="stat-value">${dayLogs.length}</div><div class="stat-label">训练场次</div></div>
+                    </div>
+                    <div style="margin-top:1rem">
+                `;
+                dayLogs.forEach(l => {
+                    const time = new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    html += `
+                        <div class="log-item">
+                            <div class="log-time">${time}</div>
+                            <div class="log-info">
+                                <div class="log-name">${l.name}</div>
+                                <div class="log-meta">${l.reps} 轮 · ${Math.round(l.duration/60)} 分钟</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function renderWeekly(container, logs) {
+            const now = new Date();
+            const weekStats = [];
+            let maxMin = 0;
+            
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(now.getDate() - i + (reportDateOffset * 7));
+                const dStr = formatDate(d);
+                const mins = Math.round(logs.filter(l => formatDate(new Date(l.timestamp)) === dStr).reduce((s, l) => s + l.duration, 0) / 60);
+                weekStats.push({ day: d.toLocaleDateString([], { weekday: 'narrow' }), mins, isToday: dStr === formatDate(now) });
+                if (mins > maxMin) maxMin = mins;
+            }
+            
+            const startDay = new Date(); startDay.setDate(now.getDate() - 6 + (reportDateOffset * 7));
+            const endDay = new Date(); endDay.setDate(now.getDate() + (reportDateOffset * 7));
+            const dateRange = `${startDay.getMonth()+1}/${startDay.getDate()} - ${endDay.getMonth()+1}/${endDay.getDate()}`;
+            
+            let html = `
+                <div class="report-nav">
+                    <button class="report-nav-btn" onclick="changeReportOffset(-1)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <span style="font-weight:700">${dateRange}</span>
+                    <button class="report-nav-btn" onclick="changeReportOffset(1)" ${reportDateOffset >= 0 ? 'disabled style="opacity:0.3"' : ''}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+                <div class="chart-container">
+            `;
+            
+            weekStats.forEach(s => {
+                const height = maxMin === 0 ? 4 : Math.max(4, (s.mins / (maxMin * 1.1)) * 100);
+                html += `
+                    <div class="chart-bar-wrapper">
+                        <div class="chart-bar ${s.isToday ? 'today' : ''}" style="height:${height}%"></div>
+                        <div class="chart-label">${s.day}</div>
+                    </div>
+                `;
+            });
+            
+            const totalMins = weekStats.reduce((s, d) => s + d.mins, 0);
+            html += `</div>
+                <div class="stat-grid" style="margin-top:1rem">
+                    <div class="stat-card"><div class="stat-value">${totalMins}</div><div class="stat-label">周总分钟</div></div>
+                    <div class="stat-card"><div class="stat-value">${Math.round(totalMins/7)}</div><div class="stat-label">日均分钟</div></div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function renderMonthly(container, logs) {
+            const targetDate = new Date();
+            targetDate.setMonth(targetDate.getMonth() + reportDateOffset);
+            const targetMonth = targetDate.getMonth();
+            const targetYear = targetDate.getFullYear();
+            
+            const monthLogs = logs.filter(l => {
+                const d = new Date(l.timestamp);
+                return d.getMonth() === targetMonth && d.getFullYear() === targetYear;
+            });
+            
+            const totalMins = Math.round(monthLogs.reduce((s, l) => s + l.duration, 0) / 60);
+            const totalSessions = monthLogs.length;
+            const uniqueDays = new Set(monthLogs.map(l => formatDate(new Date(l.timestamp)))).size;
+            
+            const counts = {};
+            monthLogs.forEach(l => counts[l.name] = (counts[l.name] || 0) + 1);
+            const topProfile = Object.keys(counts).sort((a,b) => counts[b] - counts[a])[0] || '无记录';
+
+            const monthName = targetDate.toLocaleDateString([], { year: 'numeric', month: 'long' });
+
+            let html = `
+                <div class="report-nav">
+                    <button class="report-nav-btn" onclick="changeReportOffset(-1)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <span style="font-weight:700">${monthName}</span>
+                    <button class="report-nav-btn" onclick="changeReportOffset(1)" ${reportDateOffset >= 0 ? 'disabled style="opacity:0.3"' : ''}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+                <div class="stat-grid" style="margin-top:1rem">
+                    <div class="stat-card"><div class="stat-value">${totalMins}</div><div class="stat-label">累计分钟</div></div>
+                    <div class="stat-card"><div class="stat-value">${totalSessions}</div><div class="stat-label">训练场次</div></div>
+                    <div class="stat-card"><div class="stat-value">${uniqueDays}</div><div class="stat-label">达标天数</div></div>
+                    <div class="stat-card"><div class="stat-value" style="font-size:1.1rem; line-height:1.8rem">${topProfile}</div><div class="stat-label">最常练习</div></div>
+                </div>
+            `;
+            container.innerHTML = html;
         }
 
         // Voice settings
@@ -1055,16 +1674,16 @@
 
         // Theme settings
         const themes = {
+            white: { work: '#ffffff', rest: '#ffbb00', done: '#00d2ff', glow: '255,255,255' },
             green: { work: '#00ff88', rest: '#ffbb00', done: '#00d2ff', glow: '0,255,136' },
             cyan: { work: '#00d2ff', rest: '#ffbb00', done: '#a78bfa', glow: '0,210,255' },
             purple: { work: '#a78bfa', rest: '#ffbb00', done: '#00d2ff', glow: '167,139,250' },
             pink: { work: '#f472b6', rest: '#ffbb00', done: '#00d2ff', glow: '244,114,182' },
             orange: { work: '#fb923c', rest: '#facc15', done: '#00d2ff', glow: '251,146,60' },
             yellow: { work: '#facc15', rest: '#fb923c', done: '#00d2ff', glow: '250,204,21' },
-            red: { work: '#f87171', rest: '#ffbb00', done: '#00d2ff', glow: '248,113,113' },
-            white: { work: '#ffffff', rest: '#ffbb00', done: '#00d2ff', glow: '255,255,255' }
+            red: { work: '#f87171', rest: '#ffbb00', done: '#00d2ff', glow: '248,113,113' }
         };
-        let currentTheme = localStorage.getItem('colorTheme') || 'green';
+        let currentTheme = localStorage.getItem('colorTheme') || 'white';
         function setTheme(name) {
             currentTheme = name;
             localStorage.setItem('colorTheme', name);
@@ -1123,8 +1742,8 @@
             { id: '1', projectName: '收下巴训练', holdTime: 10, restTime: 5, totalReps: 15 }
         ];
         let activeProfileId = '1';
-        let deletableProfileId = null; // Track which chip is in "long-press" mode
-        let longPressTimer = null;
+        let currentSettingsTab = 'queue';
+        let isProfileEditMode = false;
 
         // State variables
         let state = {
@@ -1147,7 +1766,9 @@
             projectNameDisplay: document.getElementById('displayProjectName'),
             timerWrapper: document.getElementById('timerWrapper'),
             modal: document.getElementById('settingsModal'),
+            reportsModal: document.getElementById('reportsModal'), // New
             profileSelector: document.getElementById('profileSelector'),
+            editProfilesBtn: document.getElementById('toggleProfileEdit'),
             inputs: {
                 name: document.getElementById('projectName'),
                 hold: document.getElementById('holdTime'),
@@ -1216,37 +1837,26 @@
                     setTimeout(() => { chip.classList.remove('new-pop'); latestAddedId = null; }, 500);
                 }
 
-                // Content Wrapper for transitions
-                const wrapper = document.createElement('div');
-                wrapper.className = 'chip-content';
-
                 const label = document.createElement('span');
                 label.className = 'chip-label';
                 label.textContent = p.name || p.projectName;
 
-                const deleteLabel = document.createElement('span');
-                deleteLabel.className = 'chip-delete-label';
-                deleteLabel.textContent = '确认移除？';
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.className = 'chip-delete-btn';
+                deleteBtn.setAttribute('aria-label', `删除${p.name || p.projectName}`);
+                deleteBtn.innerHTML = '<svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2 2L12 12M12 2L2 12" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg>';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteProfile(p.id);
+                };
 
-                wrapper.appendChild(label);
-                wrapper.appendChild(deleteLabel);
-                chip.appendChild(wrapper);
-
-                // Interaction Handling
-                chip.onmousedown = (e) => startLongPress(e, p.id);
-                chip.ontouchstart = (e) => startLongPress(e, p.id);
-                chip.onmouseup = () => cancelLongPress();
-                chip.ontouchend = () => cancelLongPress();
-                chip.onmouseleave = () => cancelLongPress();
+                chip.appendChild(label);
+                chip.appendChild(deleteBtn);
                 chip.onclick = (e) => {
                     e.stopPropagation();
-                    if (deletableProfileId === p.id) {
-                        deleteProfile(p.id);
-                    } else if (deletableProfileId) {
-                        clearDeleteMode();
-                    } else {
-                        switchProfile(p.id);
-                    }
+                    if (isProfileEditMode) return;
+                    switchProfile(p.id);
                 };
 
                 els.profileSelector.appendChild(chip);
@@ -1257,39 +1867,38 @@
             addBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
             addBtn.onclick = () => addNewProfile();
             els.profileSelector.appendChild(addBtn);
+            applyProfileEditMode();
+            updateProfileEditButtonVisibility();
         }
 
-        function startLongPress(e, id) {
-            cancelLongPress();
-            if (profiles.length <= 1) return;
-            longPressTimer = setTimeout(() => {
-                deletableProfileId = id;
-                applyDeleteMode();
-            }, 600);
-        }
-
-        function cancelLongPress() {
-            if (longPressTimer) clearTimeout(longPressTimer);
-        }
-
-        function applyDeleteMode() {
+        function applyProfileEditMode() {
             const chips = els.profileSelector.querySelectorAll('.profile-chip:not(.add-new)');
-            profiles.forEach((p, i) => {
-                const chip = chips[i];
-                if (!chip) return;
-                if (p.id === deletableProfileId) {
-                    chip.classList.add('deletable');
-                } else {
-                    chip.classList.remove('deletable');
-                }
-            });
+            chips.forEach(chip => chip.classList.toggle('editing', isProfileEditMode));
         }
 
-        function clearDeleteMode(e) {
-            if (deletableProfileId) {
-                deletableProfileId = null;
-                applyDeleteMode();
+        function updateProfileEditButtonVisibility() {
+            const canEditProfiles = currentSettingsTab === 'queue' && profiles.length > 1;
+            els.editProfilesBtn.classList.toggle('is-hidden', !canEditProfiles);
+            if (!canEditProfiles && isProfileEditMode) {
+                isProfileEditMode = false;
             }
+            applyProfileEditMode();
+            els.editProfilesBtn.classList.toggle('active', isProfileEditMode);
+        }
+
+        function toggleProfileEditMode(e) {
+            e.stopPropagation();
+            if (els.editProfilesBtn.classList.contains('is-hidden')) return;
+            isProfileEditMode = !isProfileEditMode;
+            applyProfileEditMode();
+            updateProfileEditButtonVisibility();
+        }
+
+        function clearDeleteMode() {
+            if (!isProfileEditMode) return;
+            isProfileEditMode = false;
+            applyProfileEditMode();
+            updateProfileEditButtonVisibility();
         }
 
         function switchProfile(id) {
@@ -1348,7 +1957,18 @@
             els.inputs.hold.value = config.holdTime;
             els.inputs.rest.value = config.restTime;
             els.inputs.reps.value = config.totalReps;
-            updateRepsValue();
+            
+            // Sync current slider value display
+            const repsVal = document.getElementById('repsValue');
+            if (repsVal) repsVal.textContent = config.totalReps;
+
+            // Add auto-save listeners if not already added
+            if (!els.inputs.name._autoSave) {
+                [els.inputs.name, els.inputs.hold, els.inputs.rest, els.inputs.reps].forEach(el => {
+                    el.addEventListener('input', saveSettings);
+                });
+                els.inputs.name._autoSave = true;
+            }
         }
 
         function addNewProfile() {
@@ -1368,8 +1988,15 @@
             const chipToAnimate = chipEls[index];
 
             if (chipToAnimate) {
+                if (profiles.length === 2 && isProfileEditMode) {
+                    isProfileEditMode = false;
+                    applyProfileEditMode();
+                    updateProfileEditButtonVisibility();
+                }
+                chipToAnimate.style.width = chipToAnimate.offsetWidth + 'px';
+                chipToAnimate.style.flexShrink = '0';
                 chipToAnimate.classList.add('removing');
-                setTimeout(() => finalizeDelete(id), 250);
+                setTimeout(() => finalizeDelete(id), 320);
             } else {
                 finalizeDelete(id);
             }
@@ -1379,7 +2006,6 @@
             const index = profiles.findIndex(p => p.id === id);
             profiles.splice(index, 1);
             if (activeProfileId === id) activeProfileId = profiles[0].id;
-            deletableProfileId = null;
             saveProfilesToStorage();
             renderProfileChips();
             applyActiveProfile();
@@ -1398,10 +2024,18 @@
             config.holdTime = parseInt(els.inputs.hold.value) || 10;
             config.restTime = parseInt(els.inputs.rest.value) || 0;
             config.totalReps = parseInt(els.inputs.reps.value) || 1;
+            els.inputs.repsDisplay.textContent = config.totalReps;
             saveProfilesToStorage();
-            applyActiveProfile();
-            resetTimer();
-            closeModal();
+            applyActiveProfileDetails(); 
+            if (state.phase === 'ready' || state.phase === 'done') resetTimer();
+        }
+
+        // Helper to update only UI details without re-binding listeners
+        function applyActiveProfileDetails() {
+            const config = getActiveConfig();
+            els.projectNameDisplay.textContent = config.name || config.projectName;
+            els.totalRepsDisplay.textContent = config.totalReps;
+            renderProfileChips();
         }
 
         function updateDisplay() {
@@ -1593,11 +2227,32 @@
             }
             state.phase = 'done'; state.timeLeft = 0;
             els.mainBtn.textContent = '再练一局'; els.mainBtn.classList.remove('pause');
-            els.resetBtn.style.display = 'block'; playSound('done'); updateDisplay(); releaseWakeLock();
+            els.resetBtn.style.display = 'block'; 
+            logWorkout(); // New: Log workout session
+            playSound('done'); updateDisplay(); releaseWakeLock();
         }
         function resetTimer() { clearInterval(state.intervalId); state.intervalId = null; state.phase = 'ready'; state.currentRep = 1; state.timeLeft = getActiveConfig().holdTime; state.isPaused = false; els.mainBtn.textContent = '开 始'; els.mainBtn.classList.remove('pause'); els.resetBtn.style.display = 'none'; updateDisplay(); releaseWakeLock(); }
-        function openModal() { if (state.phase !== 'ready' && state.phase !== 'done') pauseTimer(); applyActiveProfile(); els.modal.classList.add('active'); requestAnimationFrame(() => switchTab('queue')); }
-        function closeModal() { els.modal.classList.remove('active'); clearDeleteMode(); }
+        function openModal() { 
+            if (state.phase !== 'ready' && state.phase !== 'done') pauseTimer(); 
+            applyActiveProfile(); 
+            els.modal.classList.add('active'); 
+            
+            // Set initial height for slide-up
+            const content = document.querySelector('.modal-content');
+            content.style.height = 'auto'; 
+            
+            requestAnimationFrame(() => {
+                switchTab('queue');
+            });
+        }
+        function closeModal() { 
+            els.modal.classList.remove('active'); 
+            clearDeleteMode(); 
+            // Reset height to avoid interference next time
+            setTimeout(() => {
+                document.querySelector('.modal-content').style.height = '';
+            }, 450);
+        }
 
         // Swipe down to dismiss
         (function () {
