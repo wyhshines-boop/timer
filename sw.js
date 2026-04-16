@@ -1,19 +1,27 @@
-const CACHE_NAME = 'timer-v3';
-const ASSETS = [
+const CACHE_NAME = 'timer-v4';
+const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-192-maskable.png',
-  './icons/icon-512-maskable.png',
-  './icons/Group 1000003232 (1).jpg'
+  './icons/icon-512-maskable.png'
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+async function cacheAppShell() {
+  const cache = await caches.open(CACHE_NAME);
+  await Promise.allSettled(
+    APP_SHELL.map(async (asset) => {
+      const response = await fetch(asset, { cache: 'no-cache' });
+      if (!response.ok) throw new Error(`Failed to cache ${asset}`);
+      await cache.put(asset, response);
+    })
   );
+}
+
+self.addEventListener('install', (e) => {
+  e.waitUntil(cacheAppShell());
   self.skipWaiting();
 });
 
@@ -27,7 +35,27 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Google Fonts: network-first, fall back to cache
+  if (e.request.method !== 'GET') return;
+
+  const url = new URL(e.request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put('./index.html', copy);
+        });
+        return response;
+      }).catch(async () => {
+        const cachedPage = await caches.match('./index.html', { ignoreSearch: true });
+        return cachedPage || caches.match('./', { ignoreSearch: true });
+      })
+    );
+    return;
+  }
+
   if (e.request.url.includes('fonts.googleapis.com') || e.request.url.includes('fonts.gstatic.com')) {
     e.respondWith(
       fetch(e.request).then((res) => {
@@ -39,8 +67,18 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Local assets: cache-first
-  e.respondWith(
-    caches.match(e.request).then((cached) => cached || fetch(e.request))
-  );
+  if (isSameOrigin) {
+    e.respondWith(
+      caches.match(e.request, { ignoreSearch: true }).then((cached) => {
+        if (cached) return cached;
+        return fetch(e.request).then((response) => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy));
+          }
+          return response;
+        });
+      })
+    );
+  }
 });
