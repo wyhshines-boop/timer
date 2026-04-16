@@ -1,4 +1,4 @@
-const CACHE_NAME = 'timer-v2';
+const CACHE_NAME = 'timer-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -6,7 +6,8 @@ const ASSETS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-192-maskable.png',
-  './icons/icon-512-maskable.png'
+  './icons/icon-512-maskable.png',
+  './icons/Group 1000003232 (1).jpg'
 ];
 
 self.addEventListener('install', (e) => {
