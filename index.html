@@ -637,6 +637,47 @@
             font-size: 0.9rem;
         }
 
+        .guide-modal {
+            z-index: 1400;
+        }
+
+        .guide-modal .modal-content {
+            max-width: 420px;
+        }
+
+        .guide-panel-content {
+            text-align: center;
+            align-items: center;
+            padding-top: 0;
+            padding-bottom: calc(1.6rem + env(safe-area-inset-bottom, 0px));
+        }
+
+        .guide-illustration {
+            width: 112px;
+            height: 112px;
+            object-fit: contain;
+            margin: 0.2rem auto 1rem;
+        }
+
+        .guide-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.7rem;
+        }
+
+        .guide-desc {
+            font-size: 0.92rem;
+            line-height: 1.75;
+            color: var(--text-secondary);
+            max-width: 30ch;
+            margin: 0 auto 1.3rem;
+        }
+
+        .guide-confirm-btn {
+            min-width: 160px;
+        }
+
         /* Modal Settings */
         .modal {
             position: fixed;
@@ -739,7 +780,7 @@
 
         .profile-edit-toggle,
         .auto-queue-toggle {
-            height: 32px;
+            height: 37px;
             padding: 0.35rem 0.9rem;
             background: rgba(255, 255, 255, 0.08);
             border: none;
@@ -749,11 +790,15 @@
             color: var(--text-secondary);
             transition: all 0.2s;
             font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
 
         .profile-edit-toggle {
-            width: 32px;
-            height: 32px;
+            width: 37px;
+            height: 37px;
             padding: 0;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.08);
@@ -1289,6 +1334,16 @@
                 height: 20px;
             }
 
+            .profile-edit-toggle,
+            .auto-queue-toggle {
+                height: 32px;
+            }
+
+            .profile-edit-toggle {
+                width: 32px;
+                height: 32px;
+            }
+
             .modal-tabs {
                 gap: 0.8rem;
             }
@@ -1502,6 +1557,17 @@
             <div class="reports-container" id="reportsContent">
                 <!-- Content injected via JS -->
             </div>
+        </div>
+    </div>
+
+    <div class="modal guide-modal" id="autoQueueGuide">
+        <div class="modal-backdrop" onclick="closeAutoQueueGuide()"></div>
+        <div class="modal-content guide-panel-content">
+            <div class="modal-handle"></div>
+            <img class="guide-illustration" src="icons/mode.webp" alt="连练模式图标">
+            <div class="guide-title">连练模式</div>
+            <div class="guide-desc">开启后，队列中的任务会依次连续执行。全部完成后，自动回到第一个任务。</div>
+            <button class="btn btn-primary guide-confirm-btn" type="button" onclick="acknowledgeAutoQueueGuide()">明白了</button>
         </div>
     </div>
 
@@ -1910,11 +1976,29 @@
 
         // Display toggles
         let displaySettings = { progress: true, glow: true, autoQueue: false };
+        const AUTO_QUEUE_GUIDE_VERSION = '2';
         (function loadDisplaySettings() {
             const saved = localStorage.getItem('displaySettings');
             if (saved) displaySettings = { ...displaySettings, ...JSON.parse(saved) };
         })();
+        function hasSeenAutoQueueGuide() {
+            return localStorage.getItem('autoQueueGuideSeen') === AUTO_QUEUE_GUIDE_VERSION;
+        }
+        function openAutoQueueGuide() {
+            document.getElementById('autoQueueGuide').classList.add('active');
+        }
+        function closeAutoQueueGuide() {
+            document.getElementById('autoQueueGuide').classList.remove('active');
+        }
+        function acknowledgeAutoQueueGuide() {
+            localStorage.setItem('autoQueueGuideSeen', AUTO_QUEUE_GUIDE_VERSION);
+            closeAutoQueueGuide();
+        }
         function toggleDisplay(key) {
+            if (key === 'autoQueue' && !hasSeenAutoQueueGuide()) {
+                openAutoQueueGuide();
+                return;
+            }
             displaySettings[key] = !displaySettings[key];
             localStorage.setItem('displaySettings', JSON.stringify(displaySettings));
             applyDisplaySettings();
