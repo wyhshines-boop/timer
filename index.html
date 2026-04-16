@@ -660,9 +660,10 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            visibility: visible;
             opacity: 1;
             transform: scale(1);
-            transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease, background 0.22s ease, color 0.22s ease;
+            transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease, background 0.22s ease, color 0.22s ease, visibility 0s linear 0s;
         }
 
         .profile-edit-toggle svg {
@@ -687,6 +688,7 @@
             pointer-events: none;
             opacity: 0;
             transform: scale(0.88);
+            transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease, background 0.22s ease, color 0.22s ease, visibility 0s linear 0.22s;
         }
 
         .auto-queue-toggle.active {
@@ -1123,11 +1125,23 @@
 
         @media (max-width: 480px) {
             .settings-toggle {
+                top: 1.15rem;
                 right: 1rem;
+                width: 38px;
+                height: 38px;
             }
 
             .reports-toggle {
-                right: 3.9rem;
+                top: 1.15rem;
+                right: 4.3rem;
+                width: 38px;
+                height: 38px;
+            }
+
+            .settings-toggle svg,
+            .reports-toggle svg {
+                width: 20px;
+                height: 20px;
             }
 
             .modal-tabs {
@@ -1352,6 +1366,11 @@
             const content = modalEl.querySelector('.modal-content');
             const activePage = modalEl.querySelector('.tab-page.active') || modalEl.querySelector('.reports-container');
             if (!content || !activePage) return;
+            if (window.matchMedia('(max-width: 480px)').matches) {
+                content.classList.remove('transitioning');
+                content.style.height = 'auto';
+                return;
+            }
             
             // Add transitioning class to hide scrollbar
             content.classList.add('transitioning');
@@ -1753,6 +1772,8 @@
             intervalId: null,
             isPaused: false
         };
+        let settingsModalCleanupTimer = null;
+        let repsAnimationFrame = null;
 
         // DOM elements
         const els = {
@@ -1781,14 +1802,57 @@
             document.getElementById('repsValue').textContent = els.inputs.reps.value;
         }
         els.inputs.reps.addEventListener('input', updateRepsValue);
+
+        function setRepsInputValue(value) {
+            const nextValue = String(value);
+            els.inputs.reps.value = nextValue;
+            updateRepsValue();
+        }
+
+        function animateRepsInputTo(targetValue, immediate = false) {
+            if (repsAnimationFrame) {
+                cancelAnimationFrame(repsAnimationFrame);
+                repsAnimationFrame = null;
+            }
+
+            const target = Number(targetValue);
+            if (immediate || !Number.isFinite(target)) {
+                setRepsInputValue(targetValue);
+                return;
+            }
+
+            const start = Number(els.inputs.reps.value || target);
+            if (!Number.isFinite(start) || start === target) {
+                setRepsInputValue(target);
+                return;
+            }
+
+            const duration = 180;
+            const startAt = performance.now();
+
+            const tick = (now) => {
+                const progress = Math.min(1, (now - startAt) / duration);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(start + (target - start) * eased);
+                setRepsInputValue(current);
+                if (progress < 1) {
+                    repsAnimationFrame = requestAnimationFrame(tick);
+                } else {
+                    setRepsInputValue(target);
+                    repsAnimationFrame = null;
+                }
+            };
+
+            repsAnimationFrame = requestAnimationFrame(tick);
+        }
+
         function editRepsManually() {
             const val = prompt('输入总轮数', els.inputs.reps.value);
             if (val === null) return;
             const n = parseInt(val);
             if (!n || n < 1) return;
             els.inputs.reps.max = Math.max(50, n);
-            els.inputs.reps.value = n;
-            updateRepsValue();
+            setRepsInputValue(n);
         }
 
         // Get currently editing config
@@ -1956,11 +2020,7 @@
             els.inputs.name.value = config.name || config.projectName;
             els.inputs.hold.value = config.holdTime;
             els.inputs.rest.value = config.restTime;
-            els.inputs.reps.value = config.totalReps;
-            
-            // Sync current slider value display
-            const repsVal = document.getElementById('repsValue');
-            if (repsVal) repsVal.textContent = config.totalReps;
+            animateRepsInputTo(config.totalReps);
 
             // Add auto-save listeners if not already added
             if (!els.inputs.name._autoSave) {
@@ -2235,10 +2295,16 @@
         function openModal() { 
             if (state.phase !== 'ready' && state.phase !== 'done') pauseTimer(); 
             applyActiveProfile(); 
+            if (settingsModalCleanupTimer) {
+                clearTimeout(settingsModalCleanupTimer);
+                settingsModalCleanupTimer = null;
+            }
+            const content = els.modal.querySelector('.modal-content');
+            content.classList.remove('transitioning');
+            content.style.height = '';
             els.modal.classList.add('active'); 
             
             // Set initial height for slide-up
-            const content = document.querySelector('.modal-content');
             content.style.height = 'auto'; 
             
             requestAnimationFrame(() => {
@@ -2249,8 +2315,11 @@
             els.modal.classList.remove('active'); 
             clearDeleteMode(); 
             // Reset height to avoid interference next time
-            setTimeout(() => {
-                document.querySelector('.modal-content').style.height = '';
+            settingsModalCleanupTimer = setTimeout(() => {
+                const content = els.modal.querySelector('.modal-content');
+                content.classList.remove('transitioning');
+                content.style.height = '';
+                settingsModalCleanupTimer = null;
             }, 450);
         }
 
