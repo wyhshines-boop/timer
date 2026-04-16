@@ -356,6 +356,12 @@
             color: #fff;
         }
 
+        .settings-toggle:active,
+        .settings-toggle.tap-feedback {
+            color: #fff;
+            transform: scale(0.88);
+        }
+
         .settings-toggle svg {
             width: 26px;
             height: 26px;
@@ -380,6 +386,12 @@
 
         .reports-toggle:hover {
             color: #fff;
+        }
+
+        .reports-toggle:active,
+        .reports-toggle.tap-feedback {
+            color: #fff;
+            transform: scale(0.88);
         }
 
         .reports-toggle svg {
@@ -2030,6 +2042,7 @@
         let repsAnimationFrame = null;
         let repsFeedbackTimer = null;
         let lastSliderFeedbackValue = null;
+        let tapFeedbackTimer = null;
 
         // DOM elements
         const els = {
@@ -2299,20 +2312,31 @@
         });
 
         document.addEventListener('touchstart', (e) => {
-            const btn = e.target.closest('.report-nav-btn');
+            const btn = e.target.closest('.report-nav-btn, .settings-toggle, .reports-toggle');
             if (!btn || btn.disabled) return;
+            if (tapFeedbackTimer) {
+                clearTimeout(tapFeedbackTimer);
+                tapFeedbackTimer = null;
+            }
             btn.classList.add('tap-feedback');
         }, { passive: true });
 
         document.addEventListener('touchend', (e) => {
-            const btn = e.target.closest('.report-nav-btn');
+            const btn = e.target.closest('.report-nav-btn, .settings-toggle, .reports-toggle');
             if (!btn) return;
-            setTimeout(() => btn.classList.remove('tap-feedback'), 120);
+            tapFeedbackTimer = setTimeout(() => {
+                btn.classList.remove('tap-feedback');
+                tapFeedbackTimer = null;
+            }, 220);
         }, { passive: true });
 
         document.addEventListener('touchcancel', (e) => {
-            const btn = e.target.closest('.report-nav-btn');
+            const btn = e.target.closest('.report-nav-btn, .settings-toggle, .reports-toggle');
             if (!btn) return;
+            if (tapFeedbackTimer) {
+                clearTimeout(tapFeedbackTimer);
+                tapFeedbackTimer = null;
+            }
             btn.classList.remove('tap-feedback');
         }, { passive: true });
 
