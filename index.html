@@ -416,7 +416,6 @@
             background: rgba(255, 255, 255, 0.05);
             padding: 1.2rem;
             border-radius: 20px;
-            border: 1px solid var(--border-color);
         }
 
         .stat-value {
@@ -514,6 +513,18 @@
             margin-bottom: 1rem;
         }
 
+        .report-nav-title-slot {
+            position: relative;
+            flex: 1;
+            min-width: 0;
+            height: 1.6em;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.6rem;
+        }
+
         .report-nav-btn {
             background: transparent;
             border: none;
@@ -527,10 +538,96 @@
             transition: filter 0.3s ease;
         }
 
-        .report-nav-btn:hover:not(:disabled) {
+        .report-nav-btn:hover:not(:disabled),
+        .report-nav-btn:active:not(:disabled) {
             background: rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             filter: brightness(1.5);
+        }
+
+        .report-nav-title {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            font-weight: 700;
+            white-space: nowrap;
+            transform: translate(-50%, -50%);
+        }
+
+        .report-nav-title.current {
+            animation-duration: 0.28s;
+            animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+            animation-fill-mode: both;
+        }
+
+        .report-nav-title.previous {
+            animation-duration: 0.28s;
+            animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+            animation-fill-mode: both;
+        }
+
+        .report-nav-title.current.from-left {
+            animation-name: report-title-enter-from-left;
+        }
+
+        .report-nav-title.current.from-right {
+            animation-name: report-title-enter-from-right;
+        }
+
+        .report-nav-title.previous.to-left {
+            animation-name: report-title-exit-to-left;
+        }
+
+        .report-nav-title.previous.to-right {
+            animation-name: report-title-exit-to-right;
+        }
+
+        @keyframes report-title-enter-from-left {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) translateX(-28px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) translateX(0);
+            }
+        }
+
+        @keyframes report-title-enter-from-right {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) translateX(28px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) translateX(0);
+            }
+        }
+
+        @keyframes report-title-exit-to-left {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) translateX(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) translateX(-28px);
+            }
+        }
+
+        @keyframes report-title-exit-to-right {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) translateX(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) translateX(28px);
+            }
         }
 
         .report-empty {
@@ -585,6 +682,9 @@
             max-width: 600px;
             margin: 0 auto;
             -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            overscroll-behavior: contain;
         }
 
         .modal-content.transitioning {
@@ -639,6 +739,7 @@
 
         .profile-edit-toggle,
         .auto-queue-toggle {
+            height: 32px;
             padding: 0.35rem 0.9rem;
             background: rgba(255, 255, 255, 0.08);
             border: none;
@@ -689,6 +790,14 @@
             opacity: 0;
             transform: scale(0.88);
             transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease, background 0.22s ease, color 0.22s ease, visibility 0s linear 0.22s;
+        }
+
+        .profile-edit-toggle.instant-hide {
+            visibility: hidden;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.88);
+            transition: none !important;
         }
 
         .auto-queue-toggle.active {
@@ -972,6 +1081,42 @@
             color: var(--text-secondary);
             margin-bottom: 0.6rem;
             font-weight: 600;
+        }
+
+        .range-label {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.45rem;
+        }
+
+        .range-label-value {
+            color: var(--text-primary);
+            font-weight: 700;
+            cursor: pointer;
+            min-width: 1.5em;
+            text-align: left;
+        }
+
+        .range-label-value.feedback {
+            animation: reps-value-feedback 0.18s ease-out;
+        }
+
+        @keyframes reps-value-feedback {
+            0% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+
+            50% {
+                transform: scale(1.08);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         .setting-group input {
@@ -1270,7 +1415,7 @@
                 </div>
 
                 <div class="setting-group">
-                    <label>总轮数 <span id="repsValue" onclick="editRepsManually()" style="float:right;color:var(--text-primary);font-weight:700;cursor:pointer;min-width:1.5em;text-align:right"></span></label>
+                    <label class="range-label">总轮数 <span class="range-label-value" id="repsValue" onclick="editRepsManually()"></span></label>
                     <input type="range" id="totalReps" min="1" max="50" step="1">
                 </div>
 
@@ -1427,6 +1572,8 @@
         // Reports View Management
         let reportPeriod = 'daily';
         let reportDateOffset = 0; // 0 for today/this week
+        let reportTransitionDirection = 0;
+        let reportRenderedTitle = '';
 
         function openReports() {
             if (state.phase !== 'ready' && state.phase !== 'done') pauseTimer();
@@ -1446,6 +1593,7 @@
         function setReportPeriod(period) {
             reportPeriod = period;
             reportDateOffset = 0;
+            reportTransitionDirection = 0;
             
             // Fix ID mapping: monthly maps to Summary tab
             const tabId = period === 'monthly' ? 'tabReportSummary' : 'tabReport' + period.charAt(0).toUpperCase() + period.slice(1);
@@ -1470,8 +1618,30 @@
         }
 
         function changeReportOffset(delta) {
+            reportTransitionDirection = delta;
             reportDateOffset += delta;
             renderReports();
+        }
+
+        function renderReportTitle(title) {
+            const escapedCurrent = title;
+            const escapedPrevious = reportRenderedTitle;
+
+            if (!escapedPrevious || escapedPrevious === escapedCurrent || reportTransitionDirection === 0) {
+                reportRenderedTitle = escapedCurrent;
+                return `<div class="report-nav-title-slot"><span class="report-nav-title">${escapedCurrent}</span></div>`;
+            }
+
+            const previousClass = reportTransitionDirection < 0 ? 'report-nav-title previous to-left' : 'report-nav-title previous to-right';
+            const currentClass = reportTransitionDirection < 0 ? 'report-nav-title current from-right' : 'report-nav-title current from-left';
+            reportRenderedTitle = escapedCurrent;
+
+            return `
+                <div class="report-nav-title-slot">
+                    <span class="${previousClass}">${escapedPrevious}</span>
+                    <span class="${currentClass}">${escapedCurrent}</span>
+                </div>
+            `;
         }
 
         // Data Logging
@@ -1528,7 +1698,7 @@
                     <button class="report-nav-btn" onclick="changeReportOffset(-1)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
-                    <span style="font-weight:700">${displayDate}</span>
+                    ${renderReportTitle(displayDate)}
                     <button class="report-nav-btn" onclick="changeReportOffset(1)" ${reportDateOffset >= 0 ? 'disabled style="opacity:0.3"' : ''}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
@@ -1586,7 +1756,7 @@
                     <button class="report-nav-btn" onclick="changeReportOffset(-1)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
-                    <span style="font-weight:700">${dateRange}</span>
+                    ${renderReportTitle(dateRange)}
                     <button class="report-nav-btn" onclick="changeReportOffset(1)" ${reportDateOffset >= 0 ? 'disabled style="opacity:0.3"' : ''}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
@@ -1640,7 +1810,7 @@
                     <button class="report-nav-btn" onclick="changeReportOffset(-1)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
-                    <span style="font-weight:700">${monthName}</span>
+                    ${renderReportTitle(monthName)}
                     <button class="report-nav-btn" onclick="changeReportOffset(1)" ${reportDateOffset >= 0 ? 'disabled style="opacity:0.3"' : ''}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
@@ -1774,6 +1944,8 @@
         };
         let settingsModalCleanupTimer = null;
         let repsAnimationFrame = null;
+        let repsFeedbackTimer = null;
+        let lastSliderFeedbackValue = null;
 
         // DOM elements
         const els = {
@@ -1802,6 +1974,35 @@
             document.getElementById('repsValue').textContent = els.inputs.reps.value;
         }
         els.inputs.reps.addEventListener('input', updateRepsValue);
+
+        function triggerRepsFeedback() {
+            const valueEl = document.getElementById('repsValue');
+            if (!valueEl) return;
+            valueEl.classList.remove('feedback');
+            void valueEl.offsetWidth;
+            valueEl.classList.add('feedback');
+            if (repsFeedbackTimer) clearTimeout(repsFeedbackTimer);
+            repsFeedbackTimer = setTimeout(() => {
+                valueEl.classList.remove('feedback');
+                repsFeedbackTimer = null;
+            }, 220);
+        }
+
+        function triggerRepsHapticFeedback() {
+            if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return;
+            navigator.vibrate(10);
+        }
+
+        function handleRepsSliderInput() {
+            const currentValue = Number(els.inputs.reps.value);
+            updateRepsValue();
+            if (currentValue === lastSliderFeedbackValue) return;
+            lastSliderFeedbackValue = currentValue;
+            triggerRepsFeedback();
+            triggerRepsHapticFeedback();
+        }
+        els.inputs.reps.removeEventListener('input', updateRepsValue);
+        els.inputs.reps.addEventListener('input', handleRepsSliderInput);
 
         function setRepsInputValue(value) {
             const nextValue = String(value);
@@ -1942,6 +2143,7 @@
 
         function updateProfileEditButtonVisibility() {
             const canEditProfiles = currentSettingsTab === 'queue' && profiles.length > 1;
+            els.editProfilesBtn.classList.remove('instant-hide');
             els.editProfilesBtn.classList.toggle('is-hidden', !canEditProfiles);
             if (!canEditProfiles && isProfileEditMode) {
                 isProfileEditMode = false;
@@ -2049,9 +2251,11 @@
 
             if (chipToAnimate) {
                 if (profiles.length === 2 && isProfileEditMode) {
+                    els.editProfilesBtn.classList.add('instant-hide');
+                    els.editProfilesBtn.classList.add('is-hidden');
+                    els.editProfilesBtn.classList.remove('active');
                     isProfileEditMode = false;
                     applyProfileEditMode();
-                    updateProfileEditButtonVisibility();
                 }
                 chipToAnimate.style.width = chipToAnimate.offsetWidth + 'px';
                 chipToAnimate.style.flexShrink = '0';
