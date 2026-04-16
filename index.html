@@ -193,18 +193,7 @@
         }
 
         .quick-switch::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 24px;
-            width: 14px;
-            height: 14px;
-            background: #1e1e23;
-            border-right: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            border-radius: 0 0 3px 0;
-            transform: rotate(45deg);
-            clip-path: polygon(0% 100%, 100% 100%, 100% 0%);
+            display: none;
         }
 
         .quick-switch.active {
@@ -327,7 +316,7 @@
         .btn-secondary {
             background: transparent;
             color: #fff;
-            border: 1px solid white;
+            border: 1px solid rgba(255, 255, 255, 0.68);
             font-size: 1rem;
             padding: 0.6rem 2rem;
             transition: all 0.3s ease;
@@ -335,7 +324,7 @@
 
         .btn-secondary:hover {
             color: var(--text-primary);
-            border-color: var(--text-primary);
+            border-color: #fff;
             background: rgba(255, 255, 255, 0.05);
         }
 
@@ -535,7 +524,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: filter 0.3s ease;
+            transition: filter 0.3s ease, transform 0.16s ease;
         }
 
         .report-nav-btn:hover:not(:disabled),
@@ -543,6 +532,10 @@
             background: rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             filter: brightness(1.5);
+        }
+
+        .report-nav-btn:active:not(:disabled) {
+            transform: scale(0.94);
         }
 
         .report-nav-title {
@@ -1762,11 +1755,11 @@
             let html = `
                 <div class="report-nav">
                     <button class="report-nav-btn" onclick="changeReportOffset(-1)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
                     ${renderReportTitle(displayDate)}
                     <button class="report-nav-btn" onclick="changeReportOffset(1)" ${reportDateOffset >= 0 ? 'disabled style="opacity:0.3"' : ''}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </div>
             `;
@@ -1820,11 +1813,11 @@
             let html = `
                 <div class="report-nav">
                     <button class="report-nav-btn" onclick="changeReportOffset(-1)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
                     ${renderReportTitle(dateRange)}
                     <button class="report-nav-btn" onclick="changeReportOffset(1)" ${reportDateOffset >= 0 ? 'disabled style="opacity:0.3"' : ''}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </div>
                 <div class="chart-container">
@@ -1874,11 +1867,11 @@
             let html = `
                 <div class="report-nav">
                     <button class="report-nav-btn" onclick="changeReportOffset(-1)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
                     ${renderReportTitle(monthName)}
                     <button class="report-nav-btn" onclick="changeReportOffset(1)" ${reportDateOffset >= 0 ? 'disabled style="opacity:0.3"' : ''}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </div>
                 <div class="stat-grid" style="margin-top:1rem">
@@ -2376,7 +2369,6 @@
             config.holdTime = parseInt(els.inputs.hold.value) || 10;
             config.restTime = parseInt(els.inputs.rest.value) || 0;
             config.totalReps = parseInt(els.inputs.reps.value) || 1;
-            els.inputs.repsDisplay.textContent = config.totalReps;
             saveProfilesToStorage();
             applyActiveProfileDetails(); 
             if (state.phase === 'ready' || state.phase === 'done') resetTimer();
@@ -2385,9 +2377,12 @@
         // Helper to update only UI details without re-binding listeners
         function applyActiveProfileDetails() {
             const config = getActiveConfig();
-            els.projectNameDisplay.textContent = config.name || config.projectName;
+            const displayName = config.name || config.projectName;
+            els.projectNameDisplay.textContent = displayName;
             els.totalRepsDisplay.textContent = config.totalReps;
+            document.getElementById('pageTitle').textContent = displayName + ' - 计时器';
             renderProfileChips();
+            renderQuickSwitchList();
         }
 
         function updateDisplay() {
